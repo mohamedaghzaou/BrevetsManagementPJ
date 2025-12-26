@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.18.1.final using JasperReports Library version 6.18.1-9d75d1969e774d4f179fb3be8401e98a0e6d1611  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RptInvention" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5df96f01-9897-44db-9a37-b6d1e45d0d46">
+	<property name="com.jaspersoft.studio.data.sql.tables">
+		<![CDATA[ZGJicmV2ZXRzLmludmVudGlvbiBBUyAsNTgsNTAsMDA5ODkzODYtMGJkMy00Yzk5LTkwNjQtNGNi
+OWY1YTdlODVhO2RiYnJldmV0cy5kb21haW5lIEFTICwyMzgsMTI1LDdmYjVmNjY3LWNmNTQtNDMx
+ZS05ZjljLTZhZjYyYjM0YjY5ZTs=]]>
+	</property>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter (2)"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#73B0E6">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#CFDBE6">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue()%2==0)]]></conditionExpression>
+			<style backcolor="#DCEBF8"/>
+		</conditionalStyle>
+	</style>
+	<subDataset name="Dataset1" uuid="aae65850-ffc5-49a2-a672-889bff4cd2ba">
+		<property name="com.jaspersoft.studio.data.sql.tables">
+			<![CDATA[ZGJicmV2ZXRzLmludmVudGlvbiBBUyAsMzYsNDMsNTc5OWYwZTktN2MzMS00MzE4LThlZWQtMjg3
+ZGM3ZWYyODZhO2RiYnJldmV0cy5kb21haW5lIEFTICwyNDMsNjQsZjI3YjE2NzMtMWMxNy00Mzll
+LTgxNmQtYmZmOWI5MjAzOTViOw==]]>
+		</property>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter (2)"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT dbbrevets.invention.`NUM_INVENTION`,
+	dbbrevets.invention.`DESCRIPTIF`,
+	dbbrevets.invention.`RESUME`,
+	dbbrevets.domaine.`NOM_DOMAINE`
+FROM dbbrevets.invention
+	INNER JOIN dbbrevets.domaine ON 
+	 dbbrevets.invention.`NUM_DOMAINE` = dbbrevets.domaine.`NUM_DOMAINE`]]>
+		</queryString>
+		<field name="NUM_INVENTION" class="java.lang.Integer">
+			<property name="com.jaspersoft.studio.field.name" value="NUM_INVENTION"/>
+			<property name="com.jaspersoft.studio.field.label" value="NUM_INVENTION"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="invention"/>
+		</field>
+		<field name="DESCRIPTIF" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="DESCRIPTIF"/>
+			<property name="com.jaspersoft.studio.field.label" value="DESCRIPTIF"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="invention"/>
+		</field>
+		<field name="RESUME" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="RESUME"/>
+			<property name="com.jaspersoft.studio.field.label" value="RESUME"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="invention"/>
+		</field>
+		<field name="NOM_DOMAINE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="NOM_DOMAINE"/>
+			<property name="com.jaspersoft.studio.field.label" value="NOM_DOMAINE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="domaine"/>
+		</field>
+	</subDataset>
+	<queryString language="SQL">
+		<![CDATA[SELECT dbbrevets.domaine.`NOM_DOMAINE`,
+	dbbrevets.invention.`RESUME`,
+	dbbrevets.invention.`DESCRIPTIF`,
+	dbbrevets.invention.`NUM_INVENTION`
+FROM dbbrevets.invention
+	INNER JOIN dbbrevets.domaine ON 
+	 dbbrevets.invention.`NUM_DOMAINE` = dbbrevets.domaine.`NUM_DOMAINE`]]>
+	</queryString>
+	<field name="NOM_DOMAINE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NOM_DOMAINE"/>
+		<property name="com.jaspersoft.studio.field.label" value="NOM_DOMAINE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="domaine"/>
+	</field>
+	<field name="RESUME" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="RESUME"/>
+		<property name="com.jaspersoft.studio.field.label" value="RESUME"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="invention"/>
+	</field>
+	<field name="DESCRIPTIF" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="DESCRIPTIF"/>
+		<property name="com.jaspersoft.studio.field.label" value="DESCRIPTIF"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="invention"/>
+	</field>
+	<field name="NUM_INVENTION" class="java.lang.Integer">
+		<property name="com.jaspersoft.studio.field.name" value="NUM_INVENTION"/>
+		<property name="com.jaspersoft.studio.field.label" value="NUM_INVENTION"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="invention"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="324" splitType="Stretch">
+			<staticText>
+				<reportElement x="90" y="8" width="350" height="30" uuid="c5b6697f-481f-46c5-883c-e89c15dc0826"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18"/>
+				</textElement>
+				<text><![CDATA[List des Inventions]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement x="0" y="50" width="555" height="274" uuid="14e601dc-e47f-4384-b433-daafbc23860e">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+					<property name="com.jaspersoft.studio.components.autoresize.next" value="true"/>
+					<property name="com.jaspersoft.studio.components.autoresize.proportional" value="true"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Dataset1" uuid="47291fdd-7275-427d-8399-6040097fdb06">
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="139" uuid="1abbc59b-3593-4491-81ea-e6c083547d92">
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="139" height="30" uuid="9019f32b-0a97-468b-a546-3e2079c2a385"/>
+								<box topPadding="3" leftPadding="3" bottomPadding="0" rightPadding="0"/>
+								<text><![CDATA[NUM INVENTION]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="139" height="30" uuid="b2fd079b-a432-4d8c-9c38-680525d275cc"/>
+								<box topPadding="3" leftPadding="3" bottomPadding="0" rightPadding="0"/>
+								<textFieldExpression><![CDATA[$F{NUM_INVENTION}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="139" uuid="d95fa849-cbdc-4402-bac5-810a01e10909">
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="139" height="30" uuid="4da68fd3-96d6-49c1-b864-c02e298cecba"/>
+								<box topPadding="3" leftPadding="3" bottomPadding="0" rightPadding="0"/>
+								<text><![CDATA[DESCRIPTIF]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="139" height="30" uuid="d31d5fc3-020d-41dd-9423-bd719d5d5c97"/>
+								<box topPadding="3" leftPadding="3" bottomPadding="0" rightPadding="0"/>
+								<textFieldExpression><![CDATA[$F{DESCRIPTIF}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="139" uuid="b7c4497d-753f-44ec-ac44-57e97120d5ce">
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="139" height="30" uuid="9e7969f4-40bd-43b5-834f-b60277a0a414"/>
+								<box topPadding="3" leftPadding="3" bottomPadding="0" rightPadding="0"/>
+								<text><![CDATA[RESUME]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="139" height="30" uuid="41d1e636-f960-42a4-8691-68d802b2d102"/>
+								<box topPadding="3" leftPadding="3" bottomPadding="0" rightPadding="0"/>
+								<textFieldExpression><![CDATA[$F{RESUME}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="138" uuid="99d0b0c3-da71-4660-8e18-370fa834cb32">
+						<jr:columnHeader style="Table_CH" height="30">
+							<staticText>
+								<reportElement x="0" y="0" width="138" height="30" uuid="f554f3a9-4750-4411-bfa5-b76e1c7d4354"/>
+								<box topPadding="3" leftPadding="3" bottomPadding="0" rightPadding="0"/>
+								<text><![CDATA[NOM DOMAINE]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="138" height="30" uuid="eb82aa28-5460-418f-9cdb-a0a440a1f868"/>
+								<box topPadding="3" leftPadding="3" bottomPadding="0" rightPadding="0"/>
+								<textFieldExpression><![CDATA[$F{NOM_DOMAINE}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="0" y="1" width="101" height="21" uuid="2b4775a2-44da-4539-b185-e4097e104bec"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+</jasperReport>

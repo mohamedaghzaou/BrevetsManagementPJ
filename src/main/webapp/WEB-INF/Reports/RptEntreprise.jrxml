@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.18.1.final using JasperReports Library version 6.18.1-9d75d1969e774d4f179fb3be8401e98a0e6d1611  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="RptEntreprise" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="6b4d2bf0-976d-4815-ba8d-37b907775bdb">
+	<property name="com.jaspersoft.studio.data.sql.tables">
+		<![CDATA[ZGJicmV2ZXRzLmVudHJlcHJpc2UgQVMgLDEwMCw2Miw1OTVmMDdhYi1hZjQ4LTQxNmYtOTIzNC0z
+YWM0MTEzMzExMGU7]]>
+	</property>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter (2)"/>
+	<style name="Table_TH" mode="Opaque" backcolor="#DC143C">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_CH" mode="Opaque" backcolor="#DC143C">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="Table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+			<topPen lineWidth="0.5" lineColor="#000000"/>
+			<leftPen lineWidth="0.5" lineColor="#000000"/>
+			<bottomPen lineWidth="0.5" lineColor="#000000"/>
+			<rightPen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+		<conditionalStyle>
+			<conditionExpression><![CDATA[new Boolean($V{REPORT_COUNT}.intValue()%2==0)]]></conditionExpression>
+			<style backcolor="#F6C4CE"/>
+		</conditionalStyle>
+	</style>
+	<subDataset name="Dataset1" uuid="3a4d6716-1d90-4b23-b05f-d4305d8e36af">
+		<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+		<property name="com.jaspersoft.studio.data.defaultdataadapter" value="New Data Adapter (2)"/>
+		<queryString language="SQL">
+			<![CDATA[SELECT 
+	`NUM_ENTREPRISE` ,
+	 `NOM_ENTREPRISE`,
+	`ACTIVITE`,
+	`CA`,
+	`VILLE`
+FROM dbbrevets.entreprise]]>
+		</queryString>
+		<field name="NUM_ENTREPRISE" class="java.lang.Integer">
+			<property name="com.jaspersoft.studio.field.name" value="NUM_ENTREPRISE"/>
+			<property name="com.jaspersoft.studio.field.label" value="NUM_ENTREPRISE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="entreprise"/>
+		</field>
+		<field name="NOM_ENTREPRISE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="NOM_ENTREPRISE"/>
+			<property name="com.jaspersoft.studio.field.label" value="NOM_ENTREPRISE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="entreprise"/>
+		</field>
+		<field name="ACTIVITE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="ACTIVITE"/>
+			<property name="com.jaspersoft.studio.field.label" value="ACTIVITE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="entreprise"/>
+		</field>
+		<field name="CA" class="java.lang.Double">
+			<property name="com.jaspersoft.studio.field.name" value="CA"/>
+			<property name="com.jaspersoft.studio.field.label" value="CA"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="entreprise"/>
+		</field>
+		<field name="VILLE" class="java.lang.String">
+			<property name="com.jaspersoft.studio.field.name" value="VILLE"/>
+			<property name="com.jaspersoft.studio.field.label" value="VILLE"/>
+			<property name="com.jaspersoft.studio.field.tree.path" value="entreprise"/>
+		</field>
+	</subDataset>
+	<queryString language="SQL">
+		<![CDATA[SELECT `NOM_ENTREPRISE`,
+	`ACTIVITE`,
+	`CA`,
+	`VILLE`
+FROM dbbrevets.entreprise]]>
+	</queryString>
+	<field name="NOM_ENTREPRISE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="NOM_ENTREPRISE"/>
+		<property name="com.jaspersoft.studio.field.label" value="NOM_ENTREPRISE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="entreprise"/>
+	</field>
+	<field name="ACTIVITE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="ACTIVITE"/>
+		<property name="com.jaspersoft.studio.field.label" value="ACTIVITE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="entreprise"/>
+	</field>
+	<field name="CA" class="java.lang.Double">
+		<property name="com.jaspersoft.studio.field.name" value="CA"/>
+		<property name="com.jaspersoft.studio.field.label" value="CA"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="entreprise"/>
+	</field>
+	<field name="VILLE" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="VILLE"/>
+		<property name="com.jaspersoft.studio.field.label" value="VILLE"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="entreprise"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="270" splitType="Stretch">
+			<staticText>
+				<reportElement x="130" y="10" width="300" height="40" uuid="b02174fe-2915-40fd-a7d4-764254bbe71b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="18"/>
+				</textElement>
+				<text><![CDATA[List des Entreprises]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement x="0" y="70" width="555" height="200" uuid="bce6a0c5-f8b5-45bb-b89c-215a69845e34">
+					<property name="com.jaspersoft.studio.layout" value="com.jaspersoft.studio.editor.layout.VerticalRowLayout"/>
+					<property name="com.jaspersoft.studio.table.style.table_header" value="Table_TH"/>
+					<property name="com.jaspersoft.studio.table.style.column_header" value="Table_CH"/>
+					<property name="com.jaspersoft.studio.table.style.detail" value="Table_TD"/>
+					<property name="com.jaspersoft.studio.components.autoresize.next" value="true"/>
+					<property name="com.jaspersoft.studio.components.autoresize.proportional" value="true"/>
+				</reportElement>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Dataset1" uuid="27ac4ad4-9629-4306-a138-0a90b61dab2f">
+						<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+					</datasetRun>
+					<jr:column width="111" uuid="fccbf5ea-0c43-406f-910f-67b0f90457e6">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="111" height="30" forecolor="#FFFFFF" uuid="90bfa61d-0671-46de-83c3-c54b7bd35976"/>
+								<box topPadding="3" leftPadding="3"/>
+								<text><![CDATA[NOM ENTREPRISE]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="111" height="30" uuid="d370d22c-66a0-45b0-99b8-03c62b739be8"/>
+								<box topPadding="3" leftPadding="3"/>
+								<textFieldExpression><![CDATA[$F{NOM_ENTREPRISE}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="111" uuid="1442c2b9-82ba-4763-8ca9-c6c13ca15e09">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="111" height="30" forecolor="#FFFFFF" uuid="6e5369d9-6363-46e2-bd6d-2de108ac1ba9"/>
+								<box topPadding="3" leftPadding="3"/>
+								<text><![CDATA[ACTIVITE]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="111" height="30" uuid="83e51bbc-cf1c-4e3b-b7e3-f2e245e41ee3"/>
+								<box topPadding="3" leftPadding="3"/>
+								<textFieldExpression><![CDATA[$F{ACTIVITE}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="111" uuid="f117c549-cf5a-4195-baf5-f1dd428aa1f5">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="111" height="30" forecolor="#FFFFFF" uuid="b5dd2cc8-5aed-4880-a74c-806dc2627c92"/>
+								<box topPadding="3" leftPadding="3"/>
+								<text><![CDATA[CA]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="111" height="30" uuid="23b1bdfc-9095-45e7-9b98-ab4cb10cd70b"/>
+								<box topPadding="3" leftPadding="3"/>
+								<textFieldExpression><![CDATA[$F{CA}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="111" uuid="1603d198-1e09-48f7-8c85-1ecb5cab7835">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="111" height="30" forecolor="#FFFFFF" uuid="8ebb4b0c-a9f0-402d-a32d-5472f89862f2"/>
+								<box topPadding="3" leftPadding="3"/>
+								<text><![CDATA[VILLE]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="111" height="30" uuid="ed15778e-c09f-434e-b2be-cbb41faf4be1"/>
+								<box topPadding="3" leftPadding="3"/>
+								<textFieldExpression><![CDATA[$F{VILLE}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="111" uuid="532bd8a4-2626-4e86-8311-e1679fd4bae3">
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column5"/>
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="111" height="30" forecolor="#FFFFFF" uuid="23f53b95-784f-41d9-92ab-381b17b6b605"/>
+								<box topPadding="3" leftPadding="3"/>
+								<text><![CDATA[NUM ENTREPRISE]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="Table_TD" height="30">
+							<textField>
+								<reportElement x="0" y="0" width="111" height="30" uuid="881c450c-1f47-434c-b2b0-2ad3c23a609e"/>
+								<box topPadding="3" leftPadding="3"/>
+								<textFieldExpression><![CDATA[$F{NUM_ENTREPRISE}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="0" y="10" width="111" height="21" uuid="253e404b-b3a2-4851-b744-8a621726f3cc"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+</jasperReport>
