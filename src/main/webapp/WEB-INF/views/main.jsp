@@ -1,26 +1,19 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-    <!DOCTYPE html>
-    <html>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+<style type="text/css">
+    .dashboard-container {
+        padding: 10px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
 
-    <head>
-        <meta charset="ISO-8859-1">
-        <title><fmt:message key="dashboard.title" bundle="${i18n}" /></title>
-
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
-        <style type="text/css">
-            .dashboard-container {
-                padding: 10px;
-                max-width: 1200px;
-                margin: 0 auto;
-            }
-
-            .stats-cards {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 15px;
-                margin-bottom: 15px;
-            }
+    .stats-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 15px;
+    }
 
             .card {
                 background: #fff;
@@ -155,11 +148,9 @@
                 height: 240px;
                 width: 100%;
             }
-        </style>
-    </head>
+    </style>
 
-    <body>
-        <div class="dashboard-container">
+<div class="dashboard-container">
             <div class="stats-cards">
                 <a href="brevets" class="card-link">
                     <div class="card">
@@ -214,92 +205,89 @@
             </div>
         </div>
 
-        <script type="text/javascript">
-            const colors = [
-                '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b',
-                '#5a5c69', '#6610f2', '#6f42c1', '#e83e8c', '#fd7e14'
-            ];
+<script type="text/javascript">
+    const colors = [
+        '#4e73df', '#1cc88a', '#36b9cc', '#f6c23e', '#e74a3b',
+        '#5a5c69', '#6610f2', '#6f42c1', '#e83e8c', '#fd7e14'
+    ];
 
-            const Http = new XMLHttpRequest();
-            const url = 'ChartController';
-            Http.open("GET", url);
-            Http.send();
+    const Http = new XMLHttpRequest();
+    const url = 'ChartController';
+    Http.open("GET", url);
+    Http.send();
 
-            Http.onload = (e) => {
-                if (Http.status !== 200) return;
+    Http.onload = (e) => {
+        if (Http.status !== 200) return;
 
-                let dataRecieved = JSON.parse(Http.responseText);
+        let dataRecieved = JSON.parse(Http.responseText);
 
-                // Update stats
-                document.getElementById('totalBrevets').innerText = dataRecieved.totalBrevets;
-                document.getElementById('totalInventions').innerText = dataRecieved.totalInventions;
-                document.getElementById('totalInventeurs').innerText = dataRecieved.totalInventeurs;
-                document.getElementById('totalEntreprises').innerText = dataRecieved.totalEntreprises;
-                document.getElementById('totalDomaines').innerText = dataRecieved.totalDomaines;
+        // Update stats
+        document.getElementById('totalBrevets').innerText = dataRecieved.totalBrevets;
+        document.getElementById('totalInventions').innerText = dataRecieved.totalInventions;
+        document.getElementById('totalInventeurs').innerText = dataRecieved.totalInventeurs;
+        document.getElementById('totalEntreprises').innerText = dataRecieved.totalEntreprises;
+        document.getElementById('totalDomaines').innerText = dataRecieved.totalDomaines;
 
-                let inventionParDomaines = dataRecieved.inventionParDomaines;
-                let inventionParEntreprise = dataRecieved.inventionParEntreprises;
+        let inventionParDomaines = dataRecieved.inventionParDomaines;
+        let inventionParEntreprise = dataRecieved.inventionParEntreprises;
 
-                // Chart Invention Par Entreprise
-                const ctx = document.getElementById('inventionParEntreprise').getContext('2d');
-                new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: inventionParEntreprise.map(e => e.Entreprise),
-                        datasets: [{
-                            label: '<fmt:message key="dashboard.chart.brevetCount" bundle="${i18n}" />',
-                            data: inventionParEntreprise.map(e => e.nbInventions),
-                            backgroundColor: colors.slice(0, inventionParEntreprise.length),
-                            borderRadius: 6,
-                            borderWidth: 0
-                        }]
+        // Chart Invention Par Entreprise
+        const ctx = document.getElementById('inventionParEntreprise').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: inventionParEntreprise.map(e => e.Entreprise),
+                datasets: [{
+                    label: '<fmt:message key="dashboard.chart.brevetCount" bundle="${i18n}" />',
+                    data: inventionParEntreprise.map(e => e.nbInventions),
+                    backgroundColor: colors.slice(0, inventionParEntreprise.length),
+                    borderRadius: 6,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { drawBorder: false, color: '#f8f9fa' }
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: { drawBorder: false, color: '#f8f9fa' }
-                            },
-                            x: {
-                                grid: { display: false }
-                            }
-                        }
+                    x: {
+                        grid: { display: false }
                     }
-                });
-
-                // Chart Invention Par Domaine
-                const chatInventionParDomanine = document.getElementById('inventionParDomanine').getContext('2d');
-                new Chart(chatInventionParDomanine, {
-                    type: 'doughnut',
-                    data: {
-                        labels: inventionParDomaines.map(e => e.Domaine),
-                        datasets: [{
-                            data: inventionParDomaines.map(e => e.nbInventions),
-                            backgroundColor: colors.slice(0, inventionParDomaines.length),
-                            hoverOffset: 4,
-                            borderWidth: 2,
-                            borderColor: '#ffffff'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'bottom',
-                                labels: { usePointStyle: true, padding: 20 }
-                            }
-                        },
-                        cutout: '70%'
-                    }
-                });
+                }
             }
-        </script>
-    </body>
+        });
 
-    </html>
+        // Chart Invention Par Domaine
+        const chatInventionParDomanine = document.getElementById('inventionParDomanine').getContext('2d');
+        new Chart(chatInventionParDomanine, {
+            type: 'doughnut',
+            data: {
+                labels: inventionParDomaines.map(e => e.Domaine),
+                datasets: [{
+                    data: inventionParDomaines.map(e => e.nbInventions),
+                    backgroundColor: colors.slice(0, inventionParDomaines.length),
+                    hoverOffset: 4,
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { usePointStyle: true, padding: 20 }
+                    }
+                },
+                cutout: '70%'
+            }
+        });
+    }
+</script>

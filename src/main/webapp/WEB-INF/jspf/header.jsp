@@ -28,6 +28,12 @@
 	</head>
 
 	<body>
+		<div class="top-lang-switch" style="position:fixed;top:12px;right:12px;z-index:2147483647;display:flex;gap:6px;padding:4px;background:rgba(255,255,255,0.98);border:1px solid #dfe3e8;border-radius:999px;box-shadow:0 6px 16px rgba(0,0,0,0.1);">
+			<a class="btn btn-sm js-lang-switch ${sessionScope.appLang == 'fr' ? 'btn-dark' : 'btn-outline-dark'} lang-switch-btn" href="#"
+				data-lang="fr" aria-current="${sessionScope.appLang == 'fr' ? 'true' : 'false'}">FR</a>
+			<a class="btn btn-sm js-lang-switch ${sessionScope.appLang == 'en' ? 'btn-dark' : 'btn-outline-dark'} lang-switch-btn" href="#"
+				data-lang="en" aria-current="${sessionScope.appLang == 'en' ? 'true' : 'false'}">EN</a>
+		</div>
 		<div id="colorlib-page">
 			<a href="#" class="js-colorlib-nav-toggle colorlib-nav-toggle"><i></i></a>
 			<aside id="colorlib-aside" role="complementary" class="js-fullheight">
@@ -49,10 +55,6 @@
 								href="enterprises?mode=list"><i class="fa fa-building mr-2"></i> <fmt:message key="nav.entreprise" bundle="${i18n}" /></a></li>
 						<li class="${ destination == 'domaine' ? 'colorlib-active' : ''}"><a
 								href="domaines?mode=list"><i class="fa fa-globe mr-2"></i> <fmt:message key="nav.domaine" bundle="${i18n}" /></a></li>
-						<li class="mt-3 px-2 d-flex">
-							<a class="btn btn-sm btn-outline-secondary mr-2 js-lang-switch" href="#" data-lang="fr">FR</a>
-							<a class="btn btn-sm btn-outline-secondary js-lang-switch" href="#" data-lang="en">EN</a>
-						</li>
 					</ul>
 				</nav>
 			</aside>
