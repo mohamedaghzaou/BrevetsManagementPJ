@@ -14,6 +14,9 @@
 			<div class="alert alert-success" role="alert">Problem dans mise
 				 jour</div>
 		</c:if>
+		<c:if test="${status=='invalidDates' }">
+			<div class="alert alert-danger" role="alert">Date Depot doit etre inferieure ou egale a Date Validation.</div>
+		</c:if>
 
 		<input type="hidden" name="op" value="update"> <input
 			type="hidden" name="num" value="${brevet.num }">
@@ -58,3 +61,27 @@
 
 	</form>
 </div>
+
+<script type="text/javascript">
+	(function() {
+		const depotInput = document.getElementById('datedepot');
+		const validationInput = document.getElementById('datevalidation');
+
+		if (!depotInput || !validationInput) {
+			return;
+		}
+
+		function validateDates() {
+			validationInput.min = depotInput.value || '';
+			if (depotInput.value && validationInput.value && validationInput.value < depotInput.value) {
+				validationInput.setCustomValidity('Date Validation doit etre superieure ou egale a Date Depot.');
+			} else {
+				validationInput.setCustomValidity('');
+			}
+		}
+
+		depotInput.addEventListener('change', validateDates);
+		validationInput.addEventListener('change', validateDates);
+		validateDates();
+	})();
+</script>

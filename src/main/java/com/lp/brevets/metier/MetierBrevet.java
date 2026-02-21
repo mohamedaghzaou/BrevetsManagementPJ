@@ -1,17 +1,17 @@
 package com.lp.brevets.metier;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import com.lp.brevets.dao.DAO;
 import com.lp.brevets.dao.DaoBrevet;
 import com.lp.brevets.dao.DaoFactory;
-import com.lp.brevets.dao.IDAO;
 import com.lp.brevets.models.Brevet;
 
 public class MetierBrevet implements IMetier<Brevet> {
 
-	private static IDAO<Brevet> daoBrevet;
+	private static DaoBrevet daoBrevet;
 	public final static MetierBrevet INSTANCE = new MetierBrevet();
 
 	private MetierBrevet() {
@@ -43,6 +43,13 @@ public class MetierBrevet implements IMetier<Brevet> {
 	@Override
 	public boolean delete(Brevet obj) {
 		return daoBrevet.delete(obj);
+	}
+
+	public List<Brevet> search(String keyword, Integer inventeurId, Integer entrepriseId, Integer domaineId,
+			LocalDate dateDepotFrom, LocalDate dateDepotTo, LocalDate dateValidationFrom, LocalDate dateValidationTo,
+			String sortBy, String sortDirection) {
+		return daoBrevet.search(keyword, inventeurId, entrepriseId, domaineId, dateDepotFrom, dateDepotTo,
+				dateValidationFrom, dateValidationTo, sortBy, sortDirection);
 	}
 
 }

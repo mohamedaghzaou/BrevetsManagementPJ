@@ -14,27 +14,30 @@
 			<div class="alert alert-success" role="alert">Problem dans
 				l'ajout</div>
 		</c:if>
+		<c:if test="${status=='invalidDates' }">
+			<div class="alert alert-danger" role="alert">Date Depot doit etre inferieure ou egale a Date Validation.</div>
+		</c:if>
 
 		<input type="hidden" name="op" value="add">
 		<div class="form-group">
 			<label for="description">Description :</label> <input type="text"
 				class="form-control" id="description" required
-				placeholder="Entrer description" name="description">
+				placeholder="Entrer description" name="description" value="${param.description}">
 		</div>
 		<div class="form-group">
 			<label for="datedepot">Date Depot :</label> <input type="date"
-				class="form-control" id="datedepot" required name="datedepot">
+				class="form-control" id="datedepot" required name="datedepot" value="${param.datedepot}">
 		</div>
 		<div class="form-group">
 			<label for="datevalidation">Date Validation :</label> <input
 				type="date" class="form-control" id="datevalidation" required
-				name="datevalidation">
+				name="datevalidation" value="${param.datevalidation}">
 		</div>
 		<div class="form-group">
 			<label for="exampleFormControlSelect1">Inventeur :</label> <select
 				class="form-control" required name="inventeur" id="inventeur">
 				<c:forEach items="${inventeurs}" var="inventeur">
-					<option value="${inventeur.num}">${inventeur.nom }
+					<option value="${inventeur.num}" ${param.inventeur == inventeur.num ? 'selected' : ''}>${inventeur.nom }
 						${inventeur.prenom }</option>
 				</c:forEach>
 			</select>
@@ -43,7 +46,7 @@
 			<label for="exampleFormControlSelect1">Invention :</label> <select
 				class="form-control" required name="invention" id="invention">
 				<c:forEach items="${inventions}" var="invention">
-					<option value="${invention.num}">${invention}</option>
+					<option value="${invention.num}" ${param.invention == invention.num ? 'selected' : ''}>${invention}</option>
 				</c:forEach>
 			</select>
 		</div>
@@ -54,3 +57,27 @@
 
 	</form>
 </div>
+
+<script type="text/javascript">
+	(function() {
+		const depotInput = document.getElementById('datedepot');
+		const validationInput = document.getElementById('datevalidation');
+
+		if (!depotInput || !validationInput) {
+			return;
+		}
+
+		function validateDates() {
+			validationInput.min = depotInput.value || '';
+			if (depotInput.value && validationInput.value && validationInput.value < depotInput.value) {
+				validationInput.setCustomValidity('Date Validation doit etre superieure ou egale a Date Depot.');
+			} else {
+				validationInput.setCustomValidity('');
+			}
+		}
+
+		depotInput.addEventListener('change', validateDates);
+		validationInput.addEventListener('change', validateDates);
+		validateDates();
+	})();
+</script>
