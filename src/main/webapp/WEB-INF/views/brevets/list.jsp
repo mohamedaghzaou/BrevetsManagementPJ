@@ -6,7 +6,14 @@
 			Imprimer</a>
 	</div>
 
-	<form method="get" action="brevets" class="card p-3 shadow-sm mb-3">
+	<c:if test="${status == 'deleted'}">
+		<div class="alert alert-success" role="alert">Brevet supprime avec succes.</div>
+	</c:if>
+	<c:if test="${not empty globalError}">
+		<div class="alert alert-danger" role="alert">${globalError}</div>
+	</c:if>
+
+	<form method="get" action="brevets" class="card p-3 shadow-sm mb-3" data-loading="true">
 		<input type="hidden" name="mode" value="list">
 
 		<div class="form-row">
@@ -103,16 +110,27 @@
 	<p class="text-muted mb-3">
 		<i class="fa fa-list mr-1"></i> Resultats: ${totalResults} brevet(s)
 		<c:if test="${hasActiveFilters}">
-			<span class="ml-2">
+			<span class="ml-2 d-inline-flex flex-wrap align-items-center">
 				<i class="fa fa-filter mr-1"></i> Filtres:
 				<c:forEach items="${activeFilters}" var="filter">
-					<span class="badge badge-light border mr-1">${filter}</span>
+					<a class="badge badge-light border mr-1 mb-1" href="${filter.removeUrl}" data-loading-link="true">
+						${filter.label} <i class="fa fa-times ml-1"></i>
+					</a>
 				</c:forEach>
 			</span>
 		</c:if>
 	</p>
 
 	<div class="row brevetCard">
+		<c:if test="${empty brevets}">
+			<div class="col-12">
+				<div class="card p-4 text-center shadow-sm">
+					<h6 class="mb-2">Aucun brevet trouve.</h6>
+					<p class="text-muted mb-3">Essayez de modifier vos filtres ou reinitialisez la recherche.</p>
+					<a href="?mode=list" class="btn btn-outline-secondary" data-loading-link="true">Reinitialiser les filtres</a>
+				</div>
+			</div>
+		</c:if>
 		<c:forEach items="${brevets}" var="brevet">
 			<c:url var="deleteUrl" value="brevets">
 				<c:param name="mode" value="delete" />
@@ -141,7 +159,7 @@
 					<div class="d-flex justify-content-end">
 						<a class="text-success mr-3" href="?mode=updating&id=${brevet.num}&page=${currentPage}"><i class="fa fa-edit"></i>
 							Edit</a>
-						<a class="text-danger" href="${deleteUrl}"><i class="fa fa-trash"></i>
+						<a class="text-danger" href="${deleteUrl}" data-confirm-delete="true" data-delete-label="ce brevet"><i class="fa fa-trash"></i>
 							Delete</a>
 					</div>
 				</div>
@@ -182,7 +200,7 @@
 				</c:url>
 
 				<li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-					<a class="page-link" href="${currentPage == 1 ? '#' : prevPageUrl}">Precedent</a>
+					<a class="page-link ${currentPage != 1 ? 'js-loading-link' : ''}" href="${currentPage == 1 ? '#' : prevPageUrl}" data-loading-link="true">Precedent</a>
 				</li>
 
 				<c:forEach begin="1" end="${totalPages}" var="p">
@@ -201,12 +219,12 @@
 						<c:param name="sortDir" value="${param.sortDir}" />
 					</c:url>
 					<li class="page-item ${currentPage == p ? 'active' : ''}">
-						<a class="page-link" href="${pageUrl}">${p}</a>
+						<a class="page-link js-loading-link" href="${pageUrl}" data-loading-link="true">${p}</a>
 					</li>
 				</c:forEach>
 
 				<li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-					<a class="page-link" href="${currentPage == totalPages ? '#' : nextPageUrl}">Suivant</a>
+					<a class="page-link ${currentPage != totalPages ? 'js-loading-link' : ''}" href="${currentPage == totalPages ? '#' : nextPageUrl}" data-loading-link="true">Suivant</a>
 				</li>
 			</ul>
 		</nav>

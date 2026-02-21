@@ -8,10 +8,101 @@
 
     </section>
 
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1" role="dialog" aria-labelledby="deleteConfirmModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel">Confirmation de suppression</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="deleteConfirmMessage">
+                    Voulez-vous vraiment supprimer cet element ?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-dismiss="modal">Annuler</button>
+                    <a id="confirmDeleteBtn" href="#" class="btn btn-danger">Supprimer</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="pageLoadingOverlay" class="page-loading-overlay d-none">
+        <div class="text-center">
+            <div class="spinner-border text-light" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <div class="mt-2">Chargement...</div>
+        </div>
+    </div>
+
     <script src="js/jquery.min.js"></script>
     <script src="js/popper.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/main.js"></script>
+    <script>
+        (function() {
+            const overlay = document.getElementById('pageLoadingOverlay');
+            const deleteConfirmBtn = document.getElementById('confirmDeleteBtn');
+            const deleteConfirmMessage = document.getElementById('deleteConfirmMessage');
+
+            function showLoadingOverlay() {
+                if (overlay) {
+                    overlay.classList.remove('d-none');
+                }
+            }
+
+            document.querySelectorAll("form[data-loading='true']").forEach(function(form) {
+                form.addEventListener('submit', function() {
+                    showLoadingOverlay();
+                });
+            });
+
+            document.addEventListener('click', function(event) {
+                const loadingLink = event.target.closest("a[data-loading-link='true']");
+                if (loadingLink && loadingLink.getAttribute('href') && loadingLink.getAttribute('href') !== '#') {
+                    showLoadingOverlay();
+                }
+            });
+
+            document.addEventListener('click', function(event) {
+                const trigger = event.target.closest("[data-confirm-delete='true']");
+                if (!trigger) {
+                    return;
+                }
+
+                event.preventDefault();
+                const href = trigger.getAttribute('href');
+                const label = trigger.getAttribute('data-delete-label') || 'cet element';
+
+                if (!href) {
+                    return;
+                }
+
+                if (deleteConfirmMessage) {
+                    deleteConfirmMessage.textContent = "Voulez-vous vraiment supprimer " + label + " ?";
+                }
+                if (deleteConfirmBtn) {
+                    deleteConfirmBtn.setAttribute('href', href);
+                }
+
+                if (window.jQuery && window.jQuery('#deleteConfirmModal').length) {
+                    window.jQuery('#deleteConfirmModal').modal('show');
+                } else if (window.confirm("Voulez-vous vraiment supprimer " + label + " ?")) {
+                    showLoadingOverlay();
+                    window.location.href = href;
+                }
+            });
+
+            if (deleteConfirmBtn) {
+                deleteConfirmBtn.addEventListener('click', function() {
+                    showLoadingOverlay();
+                });
+            }
+        })();
+    </script>
 
 </body>
 

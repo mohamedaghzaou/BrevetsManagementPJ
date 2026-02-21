@@ -12,6 +12,9 @@ import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,16 +37,22 @@ public class Brevet implements Serializable {
 	@Column(name = "NUM_BREVET")
 	private int num;
 	@Column(name = "DESCRIPTION")
+	@NotBlank(message = "La description est obligatoire.")
+	@Size(max = 255, message = "La description ne doit pas depasser 255 caracteres.")
 	private String description;
 	@Column(name = "DATE_DEPOT")
+	@NotNull(message = "La date de depot est obligatoire.")
 	private LocalDate dateDepot;
 	@Column(name = "DATE_VALIDATION")
+	@NotNull(message = "La date de validation est obligatoire.")
 	private LocalDate dateValidation;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "num_invention")
+	@NotNull(message = "L'invention est obligatoire.")
 	private Invention invention;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "num_inventeur")
+	@NotNull(message = "L'inventeur est obligatoire.")
 	private Inventeur inventeur;
 
 	public Brevet(int id) {

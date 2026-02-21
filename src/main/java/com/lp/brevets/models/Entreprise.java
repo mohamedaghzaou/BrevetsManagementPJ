@@ -12,6 +12,9 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,12 +34,19 @@ public class Entreprise implements Serializable {
 	@Column(name = "NUM_ENTREPRISE")
 	private int num;
 	@Column(name = "NOM_ENTREPRISE")
+	@NotBlank(message = "Le nom de l'entreprise est obligatoire.")
+	@Size(max = 120, message = "Le nom de l'entreprise ne doit pas depasser 120 caracteres.")
 	private String nom;
 	@Column(name = "ACTIVITE")
+	@NotBlank(message = "L'activite est obligatoire.")
+	@Size(max = 120, message = "L'activite ne doit pas depasser 120 caracteres.")
 	private String activite;
 	@Column(name = "CA")
+	@PositiveOrZero(message = "Le chiffre d'affaires doit etre superieur ou egal a 0.")
 	private double ca;
 	@Column(name = "VILLE")
+	@NotBlank(message = "La ville est obligatoire.")
+	@Size(max = 120, message = "La ville ne doit pas depasser 120 caracteres.")
 	private String ville;
 
 	@OneToMany(mappedBy = "entreprise", cascade = CascadeType.REMOVE)

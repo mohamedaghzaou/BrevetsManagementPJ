@@ -12,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,6 +33,8 @@ public class Domaine implements Serializable {
 	@Column(name = "NUM_DOMAINE")
 	private int num;
 	@Column(name = "NOM_DOMAINE")
+	@NotBlank(message = "Le nom du domaine est obligatoire.")
+	@Size(max = 120, message = "Le nom du domaine ne doit pas depasser 120 caracteres.")
 	private String nom;
 	@OneToMany(mappedBy = "domaine", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	private List<Invention> inventions;

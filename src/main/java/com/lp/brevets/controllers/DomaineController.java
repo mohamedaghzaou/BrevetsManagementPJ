@@ -2,10 +2,10 @@ package com.lp.brevets.controllers;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,111 +15,145 @@ import com.lp.brevets.models.Domaine;
 import com.lp.brevets.util.Constants;
 
 @WebServlet("/domaines")
-public class DomaineController extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-    private static final int PAGE_SIZE = 10;
+public class DomaineController extends BaseController {
+	private static final long serialVersionUID = 1L;
+	private static final int PAGE_SIZE = 10;
 
-    private IMetier<Domaine> metier = MetierDomaine.INSTANCE;
+	private IMetier<Domaine> metier = MetierDomaine.INSTANCE;
 
-    public DomaineController() {
-        super();
-    }
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		request.setAttribute("destination", Constants.DOMAINE);
+		String command = request.getParameter("mode") == null ? "list" : request.getParameter("mode");
+		String page = "/WEB-INF/views/domaine/list.jsp";
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+		try {
+			switch (command) {
+				case "list":
+					loadDomaineListPage(request);
+					break;
+				case "adding":
+					page = "/WEB-INF/views/domaine/add.jsp";
+					if (request.getParameter("op") != null) {
+						add(request);
+					}
+					break;
+				case "updating":
+					page = "/WEB-INF/views/domaine/update.jsp";
+					if (request.getParameter("op") != null) {
+						update(request);
+					} else {
+						int id = parsePositiveInt(request.getParameter("id"), -1);
+						if (id <= 0) {
+							throw new IllegalArgumentException("Identifiant de domaine invalide.");
+						}
+						request.setAttribute(Constants.DOMAINE, metier.getOne(id));
+					}
+					break;
+				case "delete":
+					delete(request);
+					loadDomaineListPage(request);
+					break;
+				default:
+					loadDomaineListPage(request);
+					break;
+			}
 
-        request.setAttribute("destination", Constants.DOMAINE);
-        String command = request.getParameter("mode") == null ? "list" : request.getParameter("mode");
-        System.out.println("DomaineController command: " + command);
+			request.setAttribute("page", page);
+			request.getRequestDispatcher("/WEB-INF/views/home.jsp").forward(request, response);
+		} catch (Exception ex) {
+			handleControllerFailure(request, response, ex, Constants.DOMAINE);
+		}
+	}
 
-        String page = "/WEB-INF/views/domaine/list.jsp";
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doGet(request, response);
+	}
 
-        switch (command) {
-            case "list":
-                loadDomaineListPage(request);
-                break;
-            case "adding":
-                page = "/WEB-INF/views/domaine/add.jsp";
-                if (request.getParameter("op") != null) {
-                    add(request, response);
-                }
-                break;
-            case "updating":
-                page = "/WEB-INF/views/domaine/update.jsp";
-                if (request.getParameter("op") != null) {
-                    update(request, response);
-                } else {
-                    int id = Integer.parseInt(request.getParameter("id"));
-                    request.setAttribute(Constants.DOMAINE, metier.getOne(id));
-                }
-                break;
-            case "delete":
-                System.out.println("Deleting domaine with id: " + request.getParameter("id"));
-                delete(request, response);
-                loadDomaineListPage(request);
-                break;
-        }
-        request.setAttribute("page", page);
-        request.getRequestDispatcher("/WEB-INF/views/home.jsp").forward(request, response);
-    }
+	private void delete(HttpServletRequest request) {
+		int id = parsePositiveInt(request.getParameter("id"), -1);
+		if (id <= 0) {
+			request.setAttribute("globalError", "Identifiant de domaine invalide.");
+			return;
+		}
+		metier.delete(new Domaine(id));
+		request.setAttribute("status", "deleted");
+	}
 
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        doGet(request, response);
-    }
+	private Domaine constructDomaine(HttpServletRequest request, Map<String, String> fieldErrors) {
+		Domaine domaine = new Domaine();
+		domaine.setNom(requiredText(request, fieldErrors, "nom", "nom", "Le nom du domaine est obligatoire."));
+		validateBean(domaine, fieldErrors);
+		return domaine;
+	}
 
-    private void delete(HttpServletRequest request, HttpServletResponse response) {
-        int id = Integer.parseInt(request.getParameter("id"));
-        metier.delete(new Domaine(id));
-    }
+	private void add(HttpServletRequest request) {
+		Map<String, String> fieldErrors = newFieldErrors();
+		Domaine domaine = constructDomaine(request, fieldErrors);
 
-    private void add(HttpServletRequest request, HttpServletResponse response) {
-        String nom = request.getParameter("nom");
-        Domaine d = new Domaine();
-        d.setNom(nom);
-        metier.save(d);
-        request.setAttribute("status", "added");
-    }
+		if (hasErrors(fieldErrors)) {
+			request.setAttribute("status", "validationError");
+			request.setAttribute(Constants.DOMAINE, domaine);
+			publishFieldErrors(request, fieldErrors);
+			return;
+		}
 
-    private void update(HttpServletRequest request, HttpServletResponse response) {
-        int num = Integer.parseInt(request.getParameter("num"));
-        String nom = request.getParameter("nom");
-        Domaine d = new Domaine(num, nom);
-        metier.update(d);
-        request.setAttribute(Constants.DOMAINE, metier.getOne(num));
-        request.setAttribute("status", "updated");
-    }
+		try {
+			metier.save(domaine);
+			request.setAttribute("status", "added");
+		} catch (Exception ex) {
+			request.setAttribute("status", "notAdded");
+			request.setAttribute(Constants.DOMAINE, domaine);
+			request.setAttribute("globalError", "Impossible d'ajouter le domaine.");
+			log("Add domaine failed", ex);
+		}
+	}
 
-    private void loadDomaineListPage(HttpServletRequest request) {
-        int requestedPage = parsePositiveInt(request.getParameter("page"), 1);
+	private void update(HttpServletRequest request) {
+		Map<String, String> fieldErrors = newFieldErrors();
+		Domaine domaine = constructDomaine(request, fieldErrors);
+		Integer id = requiredPositiveInt(request, fieldErrors, "num", "num", "Identifiant de domaine invalide.");
+		if (id != null) {
+			domaine.setNum(id);
+		}
 
-        long totalDomaines = metier.count();
-        int totalPages = (int) Math.ceil(totalDomaines / (double) PAGE_SIZE);
-        if (totalPages == 0) {
-            totalPages = 1;
-        }
-        int currentPage = Math.min(requestedPage, totalPages);
+		if (hasErrors(fieldErrors)) {
+			request.setAttribute("status", "validationError");
+			request.setAttribute(Constants.DOMAINE, domaine);
+			publishFieldErrors(request, fieldErrors);
+			return;
+		}
 
-        List<Domaine> pageData = metier.getPage(currentPage, PAGE_SIZE);
-        request.setAttribute(Constants.DOMAINES, pageData);
-        request.getSession().setAttribute(Constants.DOMAINES, pageData);
-        request.setAttribute("currentPage", currentPage);
-        request.setAttribute("totalPages", totalPages);
-        request.setAttribute("pageSize", PAGE_SIZE);
-        request.setAttribute("totalResults", totalDomaines);
-        request.setAttribute("hasPagination", totalDomaines > PAGE_SIZE);
-    }
+		try {
+			metier.update(domaine);
+			request.setAttribute(Constants.DOMAINE, metier.getOne(id));
+			request.setAttribute("status", "updated");
+		} catch (Exception ex) {
+			request.setAttribute("status", "notUpdated");
+			request.setAttribute(Constants.DOMAINE, domaine);
+			request.setAttribute("globalError", "Impossible de mettre a jour le domaine.");
+			log("Update domaine failed", ex);
+		}
+	}
 
-    private int parsePositiveInt(String value, int defaultValue) {
-        if (value == null || value.isBlank()) {
-            return defaultValue;
-        }
-        try {
-            int parsed = Integer.parseInt(value);
-            return parsed > 0 ? parsed : defaultValue;
-        } catch (NumberFormatException ex) {
-            return defaultValue;
-        }
-    }
+	private void loadDomaineListPage(HttpServletRequest request) {
+		int requestedPage = parsePositiveInt(request.getParameter("page"), 1);
+
+		long totalDomaines = metier.count();
+		int totalPages = (int) Math.ceil(totalDomaines / (double) PAGE_SIZE);
+		if (totalPages == 0) {
+			totalPages = 1;
+		}
+		int currentPage = Math.min(requestedPage, totalPages);
+
+		List<Domaine> pageData = metier.getPage(currentPage, PAGE_SIZE);
+		request.setAttribute(Constants.DOMAINES, pageData);
+		request.getSession().setAttribute(Constants.DOMAINES, pageData);
+		request.setAttribute("currentPage", currentPage);
+		request.setAttribute("totalPages", totalPages);
+		request.setAttribute("pageSize", PAGE_SIZE);
+		request.setAttribute("totalResults", totalDomaines);
+		request.setAttribute("hasPagination", totalDomaines > PAGE_SIZE);
+	}
 }
-

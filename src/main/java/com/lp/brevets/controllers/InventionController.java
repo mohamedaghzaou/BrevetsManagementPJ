@@ -1,27 +1,37 @@
 package com.lp.brevets.controllers;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.lp.brevets.metier.IMetier;
 import com.lp.brevets.metier.MetierDomaine;
-import com.lp.brevets.metier.MetierInventeur;
 import com.lp.brevets.metier.MetierInvention;
 import com.lp.brevets.models.Domaine;
 import com.lp.brevets.models.Invention;
 import com.lp.brevets.util.Constants;
 
 @WebServlet("/inventions")
-public class InventionController extends HttpServlet {
+public class InventionController extends BaseController {
 	private static final long serialVersionUID = 1L;
 	private static final int PAGE_SIZE = 10;
-	private IMetier metier = null;
+	private static final Map<String, String> INVENTION_FIELD_ALIASES = buildInventionFieldAliases();
+
+	private IMetier<Invention> metier;
+
+	private static Map<String, String> buildInventionFieldAliases() {
+		Map<String, String> aliases = new HashMap<>();
+		aliases.put("descriptif", "description");
+		aliases.put("resume", "resume");
+		aliases.put("domaine", "domaine");
+		return aliases;
+	}
 
 	public InventionController() {
 		super();
@@ -29,106 +39,132 @@ public class InventionController extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
 		String command = request.getParameter("mode") == null ? "list" : request.getParameter("mode");
 		String page = "/WEB-INF/views/invention/list.jsp";
 		request.setAttribute("destination", Constants.INVENTIONS);
 
-		switch (command) {
-		case "list":
-			loadInventionListPage(request);
-			break;
-
-		case "adding":
-			page = "/WEB-INF/views/invention/add.jsp";
-
-			if (request.getParameter("op") != null) {
-				add(request, response);
-			} else {
-				metier = MetierDomaine.INSTANCE;
-				request.setAttribute("domaines", metier.getAll());
+		try {
+			switch (command) {
+				case "list":
+					loadInventionListPage(request);
+					break;
+				case "adding":
+					page = "/WEB-INF/views/invention/add.jsp";
+					if (request.getParameter("op") != null) {
+						add(request);
+					} else {
+						loadFormData(request);
+					}
+					break;
+				case "updating":
+					page = "/WEB-INF/views/invention/update.jsp";
+					if (request.getParameter("op") != null) {
+						update(request);
+					} else {
+						int id = parsePositiveInt(request.getParameter("id"), -1);
+						if (id <= 0) {
+							throw new IllegalArgumentException("Identifiant d'invention invalide.");
+						}
+						metier = MetierInvention.INSTANCE;
+						request.setAttribute(Constants.INVENTION, metier.getOne(id));
+						loadFormData(request);
+					}
+					break;
+				case "delete":
+					delete(request);
+					loadInventionListPage(request);
+					break;
+				default:
+					loadInventionListPage(request);
+					break;
 			}
-			break;
-		case "updating":
-			page = "/WEB-INF/views/invention/update.jsp";
 
-			if (request.getParameter("op") != null) {
-				update(request, response);
-			} else {
-				int id = Integer.parseInt(request.getParameter("id"));
-
-				metier = MetierInvention.INSTANCE;
-				request.setAttribute("invention", metier.getOne(id));
-				metier = MetierDomaine.INSTANCE;
-				request.setAttribute("domaines", metier.getAll());
-
-			}
-			break;
-		case "delete":
-			delete(request, response);
-			loadInventionListPage(request);
-			break;
+			request.setAttribute("page", page);
+			request.getRequestDispatcher("/WEB-INF/views/home.jsp").forward(request, response);
+		} catch (Exception ex) {
+			handleControllerFailure(request, response, ex, Constants.INVENTIONS);
 		}
-
-		request.setAttribute("page", page);
-		request.getRequestDispatcher("/WEB-INF/views/home.jsp").forward(request, response);
-
 	}
 
-	private void update(HttpServletRequest request, HttpServletResponse response) {
-
-		try {
-
-			metier = MetierInvention.INSTANCE;
-			int id = Integer.parseInt(request.getParameter("id"));
-
-			Invention invention = constructInvention(request, response);
+	private void update(HttpServletRequest request) {
+		Map<String, String> fieldErrors = newFieldErrors();
+		Invention invention = constructInvention(request, fieldErrors);
+		Integer id = requiredPositiveInt(request, fieldErrors, "id", "id", "Identifiant d'invention invalide.");
+		if (id != null) {
 			invention.setNum(id);
-			metier.update(invention);
-			request.setAttribute("invention", metier.getOne(id));
-			metier = MetierDomaine.INSTANCE;
-			request.setAttribute("domaines", metier.getAll());
-
-			request.setAttribute("status", "updated");
-		} catch (Exception e) {
-
-			request.setAttribute("status", "Notupdated");
-
 		}
-	}
 
-	private void add(HttpServletRequest request, HttpServletResponse response) {
+		if (hasErrors(fieldErrors)) {
+			request.setAttribute("status", "validationError");
+			request.setAttribute(Constants.INVENTION, invention);
+			publishFieldErrors(request, fieldErrors);
+			loadFormData(request);
+			return;
+		}
 
 		try {
 			metier = MetierInvention.INSTANCE;
+			metier.update(invention);
+			request.setAttribute(Constants.INVENTION, metier.getOne(id));
+			request.setAttribute("status", "updated");
+		} catch (Exception ex) {
+			request.setAttribute("status", "notUpdated");
+			request.setAttribute(Constants.INVENTION, invention);
+			request.setAttribute("globalError", "Impossible de mettre a jour l'invention.");
+			log("Update invention failed", ex);
+		}
+		loadFormData(request);
+	}
 
-			Invention invention = constructInvention(request, response);
+	private void add(HttpServletRequest request) {
+		Map<String, String> fieldErrors = newFieldErrors();
+		Invention invention = constructInvention(request, fieldErrors);
+
+		if (hasErrors(fieldErrors)) {
+			request.setAttribute("status", "validationError");
+			request.setAttribute(Constants.INVENTION, invention);
+			publishFieldErrors(request, fieldErrors);
+			loadFormData(request);
+			return;
+		}
+
+		try {
+			metier = MetierInvention.INSTANCE;
 			metier.save(invention);
 			request.setAttribute("status", "added");
-			metier = MetierDomaine.INSTANCE;
-			request.setAttribute("domaines", metier.getAll());
-
-		} catch (Exception e) {
+		} catch (Exception ex) {
 			request.setAttribute("status", "Notadded");
-
+			request.setAttribute("globalError", "Impossible d'ajouter l'invention.");
+			log("Add invention failed", ex);
 		}
+		loadFormData(request);
 	}
 
-	private void delete(HttpServletRequest request, HttpServletResponse response) {
-		int id = Integer.parseInt(request.getParameter("id"));
+	private void delete(HttpServletRequest request) {
+		int id = parsePositiveInt(request.getParameter("id"), -1);
+		if (id <= 0) {
+			request.setAttribute("globalError", "Identifiant d'invention invalide.");
+			return;
+		}
 		metier = MetierInvention.INSTANCE;
 		metier.delete(new Invention(id));
-
+		request.setAttribute("status", "deleted");
 	}
 
-	private Invention constructInvention(HttpServletRequest request, HttpServletResponse response) {
+	private Invention constructInvention(HttpServletRequest request, Map<String, String> fieldErrors) {
 		Invention invention = new Invention();
-		invention.setDescriptif(request.getParameter("description"));
-		invention.setResume(request.getParameter("resume"));
-		invention.setDomaine(new Domaine(Integer.parseInt(request.getParameter("domaine"))));
+		invention.setDescriptif(
+				requiredText(request, fieldErrors, "description", "description", "La description est obligatoire."));
+		invention.setResume(requiredText(request, fieldErrors, "resume", "resume", "Le resume est obligatoire."));
 
+		Integer domaineId = requiredPositiveInt(request, fieldErrors, "domaine", "domaine",
+				"Veuillez selectionner un domaine.");
+		if (domaineId != null) {
+			invention.setDomaine(new Domaine(domaineId));
+		}
+
+		validateBean(invention, fieldErrors, INVENTION_FIELD_ALIASES);
 		return invention;
-
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -138,7 +174,6 @@ public class InventionController extends HttpServlet {
 
 	private void loadInventionListPage(HttpServletRequest request) {
 		int requestedPage = parsePositiveInt(request.getParameter("page"), 1);
-
 		metier = MetierInvention.INSTANCE;
 		long totalInventions = metier.count();
 		int totalPages = (int) Math.ceil(totalInventions / (double) PAGE_SIZE);
@@ -157,17 +192,7 @@ public class InventionController extends HttpServlet {
 		request.setAttribute("hasPagination", totalInventions > PAGE_SIZE);
 	}
 
-	private int parsePositiveInt(String value, int defaultValue) {
-		if (value == null || value.isBlank()) {
-			return defaultValue;
-		}
-		try {
-			int parsed = Integer.parseInt(value);
-			return parsed > 0 ? parsed : defaultValue;
-		} catch (NumberFormatException ex) {
-			return defaultValue;
-		}
+	private void loadFormData(HttpServletRequest request) {
+		request.setAttribute(Constants.DOMAINES, MetierDomaine.INSTANCE.getAll());
 	}
-
 }
-

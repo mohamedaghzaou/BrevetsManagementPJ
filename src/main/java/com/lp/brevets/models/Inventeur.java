@@ -15,6 +15,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Size;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,17 +39,29 @@ public class Inventeur implements Serializable {
 	@Column(name = "NUM_INVENTEUR")
 	private int num;
 	@Column(name = "NOM")
+	@NotBlank(message = "Le nom est obligatoire.")
+	@Size(max = 80, message = "Le nom ne doit pas depasser 80 caracteres.")
 	private String nom;
 	@Column(name = "PRENOM")
+	@NotBlank(message = "Le prenom est obligatoire.")
+	@Size(max = 80, message = "Le prenom ne doit pas depasser 80 caracteres.")
 	private String prenom;
 	@Column(name = "ADRESSE")
+	@NotBlank(message = "L'adresse est obligatoire.")
+	@Size(max = 255, message = "L'adresse ne doit pas depasser 255 caracteres.")
 	private String adresse;
 	@Column(name = "DATE_NAISS")
+	@NotNull(message = "La date de naissance est obligatoire.")
+	@PastOrPresent(message = "La date de naissance ne peut pas etre dans le futur.")
 	private LocalDate date_nais;
 	@Column(name = "EMAIL")
+	@NotBlank(message = "L'email est obligatoire.")
+	@Email(message = "Le format de l'email est invalide.")
+	@Size(max = 120, message = "L'email ne doit pas depasser 120 caracteres.")
 	private String email;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "NUM_ENTREPRISE")
+	@NotNull(message = "L'entreprise est obligatoire.")
 	private Entreprise entreprise;
 	@OneToMany(mappedBy = "inventeur", cascade = CascadeType.REMOVE)
 	private List<Brevet> brevets;

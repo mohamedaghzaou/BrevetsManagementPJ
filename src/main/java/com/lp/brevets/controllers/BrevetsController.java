@@ -1,19 +1,16 @@
 package com.lp.brevets.controllers;
 
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -31,71 +28,69 @@ import com.lp.brevets.models.Invention;
 import com.lp.brevets.util.Constants;
 
 @WebServlet("/brevets")
-public class BrevetsController extends HttpServlet {
+public class BrevetsController extends BaseController {
 	private static final long serialVersionUID = 1L;
 	private static final int PAGE_SIZE = 9;
+	private static final Map<String, String> BREVET_FIELD_ALIASES = buildBrevetFieldAliases();
 
-	private IMetier metier;
+	private IMetier<Brevet> metier;
 
-	public BrevetsController() {
-		super();
-
+	private static Map<String, String> buildBrevetFieldAliases() {
+		Map<String, String> aliases = new HashMap<>();
+		aliases.put("description", "description");
+		aliases.put("dateDepot", "datedepot");
+		aliases.put("dateValidation", "datevalidation");
+		aliases.put("invention", "invention");
+		aliases.put("inventeur", "inventeur");
+		return aliases;
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
 		request.setAttribute("destination", Constants.BREVETS);
 		String command = request.getParameter("mode") == null ? "list" : request.getParameter("mode");
-
 		String page = "/WEB-INF/views/brevets/list.jsp";
 
-		switch (command) {
-			case "list":
-				loadBrevetSearchPageData(request);
-				break;
-			case "adding":
-				page = "/WEB-INF/views/brevets/add.jsp";
-
-				if (request.getParameter("op") != null) {
-					add(request, response);
-				} else {
-					metier = MetierInventeur.INSTANCE;
-					request.setAttribute(Constants.INVENTEURS, metier.getAll());
-					metier = MetierInvention.INSTANCE;
-					request.setAttribute(Constants.INVENTIONS, metier.getAll());
-				}
-
-				break;
-			case "updating":
-				page = "/WEB-INF/views/brevets/update.jsp";
-
-				if (request.getParameter("op") != null) {
-					update(request, response);
-
-				} else {
-
-					int id = Integer.parseInt(request.getParameter("id"));
-					metier = MetierBrevet.INSTANCE;
-					request.setAttribute(Constants.BREVET, metier.getOne(id));
-
-					metier = MetierInventeur.INSTANCE;
-					request.setAttribute(Constants.INVENTEURS, metier.getAll());
-
-					metier = MetierInvention.INSTANCE;
-					request.setAttribute(Constants.INVENTIONS, metier.getAll());
-
-				}
-
-				break;
-			case "delete":
-
-				delete(request, response);
-				loadBrevetSearchPageData(request);
-				break;
+		try {
+			switch (command) {
+				case "list":
+					loadBrevetSearchPageData(request);
+					break;
+				case "adding":
+					page = "/WEB-INF/views/brevets/add.jsp";
+					if (request.getParameter("op") != null) {
+						add(request);
+					} else {
+						loadBrevetFormData(request);
+					}
+					break;
+				case "updating":
+					page = "/WEB-INF/views/brevets/update.jsp";
+					if (request.getParameter("op") != null) {
+						update(request);
+					} else {
+						int id = parsePositiveInt(request.getParameter("id"), -1);
+						if (id <= 0) {
+							throw new IllegalArgumentException("Identifiant de brevet invalide.");
+						}
+						metier = MetierBrevet.INSTANCE;
+						request.setAttribute(Constants.BREVET, metier.getOne(id));
+						loadBrevetFormData(request);
+					}
+					break;
+				case "delete":
+					delete(request);
+					loadBrevetSearchPageData(request);
+					break;
+				default:
+					loadBrevetSearchPageData(request);
+					break;
+			}
+			request.setAttribute("page", page);
+			request.getRequestDispatcher("/WEB-INF/views/home.jsp").forward(request, response);
+		} catch (Exception ex) {
+			handleControllerFailure(request, response, ex, Constants.BREVETS);
 		}
-		request.setAttribute("page", page);
-		request.getRequestDispatcher("/WEB-INF/views/home.jsp").forward(request, response);
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -103,26 +98,28 @@ public class BrevetsController extends HttpServlet {
 		doGet(request, response);
 	}
 
-	private void delete(HttpServletRequest request, HttpServletResponse response) {
-
-		int id = Integer.parseInt(request.getParameter("id"));
+	private void delete(HttpServletRequest request) {
+		int id = parsePositiveInt(request.getParameter("id"), -1);
+		if (id <= 0) {
+			request.setAttribute("globalError", "Identifiant de brevet invalide.");
+			return;
+		}
 		metier = MetierBrevet.INSTANCE;
 		metier.delete(new Brevet(id));
-
+		request.setAttribute("status", "deleted");
 	}
 
 	private void loadBrevetSearchPageData(HttpServletRequest request) {
 		int requestedPage = parsePositiveInt(request.getParameter("page"), 1);
 
 		String keyword = normalizeKeyword(request.getParameter("keyword"));
-		Integer inventeurId = parseOptionalInteger(request.getParameter("inventeurId"));
-		Integer entrepriseId = parseOptionalInteger(request.getParameter("entrepriseId"));
-		Integer domaineId = parseOptionalInteger(request.getParameter("domaineId"));
+		Integer inventeurId = parseOptionalPositiveInt(request.getParameter("inventeurId"));
+		Integer entrepriseId = parseOptionalPositiveInt(request.getParameter("entrepriseId"));
+		Integer domaineId = parseOptionalPositiveInt(request.getParameter("domaineId"));
 		LocalDate dateDepotFrom = parseOptionalDate(request.getParameter("dateDepotFrom"));
 		LocalDate dateDepotTo = parseOptionalDate(request.getParameter("dateDepotTo"));
 		LocalDate dateValidationFrom = parseOptionalDate(request.getParameter("dateValidationFrom"));
 		LocalDate dateValidationTo = parseOptionalDate(request.getParameter("dateValidationTo"));
-
 		String sortBy = normalizeSortBy(request.getParameter("sortBy"));
 		String sortDirection = normalizeSortDirection(request.getParameter("sortDir"));
 
@@ -146,56 +143,89 @@ public class BrevetsController extends HttpServlet {
 		request.setAttribute("totalResults", totalBrevets);
 		request.setAttribute("hasPagination", totalBrevets > PAGE_SIZE);
 
-		metier = MetierInventeur.INSTANCE;
-		List<Inventeur> inventeurs = metier.getAll();
+		List<Inventeur> inventeurs = MetierInventeur.INSTANCE.getAll();
 		request.setAttribute(Constants.INVENTEURS, inventeurs);
-
-		metier = MetierEntreprise.INSTANCE;
-		List<Entreprise> entreprises = metier.getAll();
+		List<Entreprise> entreprises = MetierEntreprise.INSTANCE.getAll();
 		request.setAttribute(Constants.ENTREPRISES, entreprises);
-
-		metier = MetierDomaine.INSTANCE;
-		List<Domaine> domaines = metier.getAll();
+		List<Domaine> domaines = MetierDomaine.INSTANCE.getAll();
 		request.setAttribute(Constants.DOMAINES, domaines);
 
-		List<String> activeFilters = buildActiveFilters(keyword, inventeurId, entrepriseId, domaineId, dateDepotFrom,
-				dateDepotTo, dateValidationFrom, dateValidationTo, inventeurs, entreprises, domaines);
+		List<ActiveFilterChip> activeFilters = buildActiveFilters(keyword, inventeurId, entrepriseId, domaineId, dateDepotFrom,
+				dateDepotTo, dateValidationFrom, dateValidationTo, sortBy, sortDirection, inventeurs, entreprises, domaines);
 		request.setAttribute("activeFilters", activeFilters);
 		request.setAttribute("hasActiveFilters", !activeFilters.isEmpty());
 	}
 
-	private List<String> buildActiveFilters(String keyword, Integer inventeurId, Integer entrepriseId, Integer domaineId,
+	private List<ActiveFilterChip> buildActiveFilters(String keyword, Integer inventeurId, Integer entrepriseId, Integer domaineId,
 			LocalDate dateDepotFrom, LocalDate dateDepotTo, LocalDate dateValidationFrom, LocalDate dateValidationTo,
-			List<Inventeur> inventeurs, List<Entreprise> entreprises, List<Domaine> domaines) {
-		List<String> filters = new ArrayList<>();
+			String sortBy, String sortDirection, List<Inventeur> inventeurs, List<Entreprise> entreprises,
+			List<Domaine> domaines) {
+		List<ActiveFilterChip> filters = new ArrayList<>();
 
 		if (keyword != null) {
-			filters.add("Recherche: " + keyword);
+			filters.add(new ActiveFilterChip("Recherche: " + keyword, buildFilterUrl(null, inventeurId, entrepriseId, domaineId,
+					dateDepotFrom, dateDepotTo, dateValidationFrom, dateValidationTo, sortBy, sortDirection)));
 		}
-
 		if (inventeurId != null) {
-			filters.add("Inventeur: " + findInventeurLabel(inventeurs, inventeurId));
+			filters.add(new ActiveFilterChip("Inventeur: " + findInventeurLabel(inventeurs, inventeurId),
+					buildFilterUrl(keyword, null, entrepriseId, domaineId, dateDepotFrom, dateDepotTo, dateValidationFrom,
+							dateValidationTo, sortBy, sortDirection)));
 		}
-
 		if (entrepriseId != null) {
-			filters.add("Entreprise: " + findEntrepriseLabel(entreprises, entrepriseId));
+			filters.add(new ActiveFilterChip("Entreprise: " + findEntrepriseLabel(entreprises, entrepriseId),
+					buildFilterUrl(keyword, inventeurId, null, domaineId, dateDepotFrom, dateDepotTo, dateValidationFrom,
+							dateValidationTo, sortBy, sortDirection)));
 		}
-
 		if (domaineId != null) {
-			filters.add("Domaine: " + findDomaineLabel(domaines, domaineId));
+			filters.add(new ActiveFilterChip("Domaine: " + findDomaineLabel(domaines, domaineId), buildFilterUrl(keyword,
+					inventeurId, entrepriseId, null, dateDepotFrom, dateDepotTo, dateValidationFrom, dateValidationTo, sortBy,
+					sortDirection)));
 		}
 
 		String depotRange = formatDateRange("Depot", dateDepotFrom, dateDepotTo);
 		if (depotRange != null) {
-			filters.add(depotRange);
+			filters.add(new ActiveFilterChip(depotRange, buildFilterUrl(keyword, inventeurId, entrepriseId, domaineId, null, null,
+					dateValidationFrom, dateValidationTo, sortBy, sortDirection)));
 		}
 
 		String validationRange = formatDateRange("Validation", dateValidationFrom, dateValidationTo);
 		if (validationRange != null) {
-			filters.add(validationRange);
+			filters.add(new ActiveFilterChip(validationRange, buildFilterUrl(keyword, inventeurId, entrepriseId, domaineId,
+					dateDepotFrom, dateDepotTo, null, null, sortBy, sortDirection)));
 		}
 
 		return filters;
+	}
+
+	private String buildFilterUrl(String keyword, Integer inventeurId, Integer entrepriseId, Integer domaineId,
+			LocalDate dateDepotFrom, LocalDate dateDepotTo, LocalDate dateValidationFrom, LocalDate dateValidationTo,
+			String sortBy, String sortDirection) {
+		StringBuilder builder = new StringBuilder("brevets?mode=list");
+		appendQueryParam(builder, "keyword", keyword);
+		appendQueryParam(builder, "inventeurId", inventeurId);
+		appendQueryParam(builder, "entrepriseId", entrepriseId);
+		appendQueryParam(builder, "domaineId", domaineId);
+		appendQueryParam(builder, "dateDepotFrom", dateDepotFrom);
+		appendQueryParam(builder, "dateDepotTo", dateDepotTo);
+		appendQueryParam(builder, "dateValidationFrom", dateValidationFrom);
+		appendQueryParam(builder, "dateValidationTo", dateValidationTo);
+		appendQueryParam(builder, "sortBy", sortBy);
+		appendQueryParam(builder, "sortDir", sortDirection);
+		return builder.toString();
+	}
+
+	private void appendQueryParam(StringBuilder builder, String key, Object value) {
+		if (value == null) {
+			return;
+		}
+		String text = String.valueOf(value);
+		if (text.isBlank()) {
+			return;
+		}
+		builder.append('&')
+				.append(key)
+				.append('=')
+				.append(URLEncoder.encode(text, StandardCharsets.UTF_8));
 	}
 
 	private String findInventeurLabel(List<Inventeur> inventeurs, int inventeurId) {
@@ -252,29 +282,6 @@ public class BrevetsController extends HttpServlet {
 		return normalized.isEmpty() ? null : normalized;
 	}
 
-	private Integer parseOptionalInteger(String value) {
-		if (value == null || value.isBlank()) {
-			return null;
-		}
-		try {
-			int id = Integer.parseInt(value);
-			return id > 0 ? id : null;
-		} catch (NumberFormatException ex) {
-			return null;
-		}
-	}
-
-	private LocalDate parseOptionalDate(String value) {
-		if (value == null || value.isBlank()) {
-			return null;
-		}
-		try {
-			return LocalDate.parse(value);
-		} catch (DateTimeParseException ex) {
-			return null;
-		}
-	}
-
 	private String normalizeSortBy(String sortBy) {
 		if (sortBy == null || sortBy.isBlank()) {
 			return "dateDepot";
@@ -299,121 +306,109 @@ public class BrevetsController extends HttpServlet {
 		return "desc";
 	}
 
-	private int parsePositiveInt(String value, int defaultValue) {
-		if (value == null || value.isBlank()) {
-			return defaultValue;
-		}
-		try {
-			int parsed = Integer.parseInt(value);
-			return parsed > 0 ? parsed : defaultValue;
-		} catch (NumberFormatException ex) {
-			return defaultValue;
-		}
-	}
+	private void add(HttpServletRequest request) {
+		Map<String, String> fieldErrors = newFieldErrors();
+		Brevet brevet = constructBrevet(request, fieldErrors);
 
-	private void add(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-		try {
-			metier = MetierBrevet.INSTANCE;
-			Brevet v = constructBrevet(request, response);
-			if (!isDateOrderValid(v)) {
-				request.setAttribute("status", "invalidDates");
-				loadBrevetFormData(request);
-				return;
-			}
-			metier.save(v);
-			request.setAttribute("status", "added");
-		}
-
-		catch (Exception eX) {
-			request.setAttribute("status", "Notadde");
-
-			System.out.println("conversion error");
-		}
-
-		loadBrevetFormData(request);
-
-	}
-
-	private void update(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-		metier = MetierBrevet.INSTANCE;
-
-		Brevet v = constructBrevet(request, response);
-		v.setNum(Integer.parseInt(request.getParameter("num")));
-		if (!isDateOrderValid(v)) {
-			request.setAttribute("status", "invalidDates");
-			request.setAttribute(Constants.BREVET, v);
+		if (hasErrors(fieldErrors)) {
+			request.setAttribute("status", "validationError");
+			request.setAttribute(Constants.BREVET, brevet);
+			publishFieldErrors(request, fieldErrors);
 			loadBrevetFormData(request);
 			return;
 		}
 
 		try {
 			metier = MetierBrevet.INSTANCE;
-			metier.update(v);
-			int id = Integer.parseInt(request.getParameter("num"));
-			metier = MetierBrevet.INSTANCE;
-			request.setAttribute(Constants.BREVET, metier.getOne(id));
-			metier = MetierInventeur.INSTANCE;
-			request.setAttribute(Constants.INVENTEURS, metier.getAll());
-			metier = MetierInvention.INSTANCE;
-			request.setAttribute(Constants.INVENTIONS, metier.getAll());
-			request.setAttribute("status", "updated");
+			metier.save(brevet);
+			request.setAttribute("status", "added");
+		} catch (Exception ex) {
+			request.setAttribute("status", "Notadde");
+			request.setAttribute("globalError", "Impossible d'ajouter le brevet pour le moment.");
+			log("Add brevet failed", ex);
+		}
+		loadBrevetFormData(request);
+	}
 
-		} catch (Exception eX) {
-			request.setAttribute("status", "notUpdated");
-			int id = Integer.parseInt(request.getParameter("num"));
-			metier = MetierBrevet.INSTANCE;
-			request.setAttribute(Constants.BREVET, metier.getOne(id));
-			loadBrevetFormData(request);
-
-			System.out.println("conversion error");
+	private void update(HttpServletRequest request) {
+		Map<String, String> fieldErrors = newFieldErrors();
+		Brevet brevet = constructBrevet(request, fieldErrors);
+		Integer id = requiredPositiveInt(request, fieldErrors, "num", "num", "Identifiant de brevet invalide.");
+		if (id != null) {
+			brevet.setNum(id);
 		}
 
+		if (hasErrors(fieldErrors)) {
+			request.setAttribute("status", "validationError");
+			request.setAttribute(Constants.BREVET, brevet);
+			publishFieldErrors(request, fieldErrors);
+			loadBrevetFormData(request);
+			return;
+		}
+
+		try {
+			metier = MetierBrevet.INSTANCE;
+			metier.update(brevet);
+			request.setAttribute(Constants.BREVET, metier.getOne(id));
+			request.setAttribute("status", "updated");
+		} catch (Exception ex) {
+			request.setAttribute("status", "notUpdated");
+			request.setAttribute(Constants.BREVET, brevet);
+			request.setAttribute("globalError", "Impossible de mettre a jour le brevet pour le moment.");
+			log("Update brevet failed", ex);
+		}
+		loadBrevetFormData(request);
 	}
 
 	private void loadBrevetFormData(HttpServletRequest request) {
-		metier = MetierInventeur.INSTANCE;
-		request.setAttribute(Constants.INVENTEURS, metier.getAll());
-		metier = MetierInvention.INSTANCE;
-		request.setAttribute(Constants.INVENTIONS, metier.getAll());
+		request.setAttribute(Constants.INVENTEURS, MetierInventeur.INSTANCE.getAll());
+		request.setAttribute(Constants.INVENTIONS, MetierInvention.INSTANCE.getAll());
 	}
 
-	private boolean isDateOrderValid(Brevet brevet) {
-		if (brevet.getDateDepot() == null || brevet.getDateValidation() == null) {
-			return false;
+	private Brevet constructBrevet(HttpServletRequest request, Map<String, String> fieldErrors) {
+		Brevet brevet = new Brevet();
+		brevet.setDescription(requiredText(request, fieldErrors, "description", "description", "La description est obligatoire."));
+		brevet.setDateDepot(requiredDate(request, fieldErrors, "datedepot", "datedepot", "La date de depot est invalide."));
+		brevet.setDateValidation(
+				requiredDate(request, fieldErrors, "datevalidation", "datevalidation", "La date de validation est invalide."));
+
+		Integer inventionId = requiredPositiveInt(request, fieldErrors, "invention", "invention",
+				"Veuillez selectionner une invention.");
+		if (inventionId != null) {
+			brevet.setInvention(new Invention(inventionId));
 		}
-		return !brevet.getDateDepot().isAfter(brevet.getDateValidation());
-	}
 
-	private Brevet constructBrevet(HttpServletRequest request, HttpServletResponse response) {
-
-		Brevet v = new Brevet();
-		v.setInvention(new Invention(Integer.parseInt(request.getParameter("invention"))));
-
-		v.setInventeur(new Inventeur(Integer.parseInt(request.getParameter("inventeur"))));
-		v.setDescription(request.getParameter("description"));
-
-		try {
-			SimpleDateFormat dateformt = new SimpleDateFormat("yyyy-MM-dd");
-
-			Date dateDepot = dateformt.parse(request.getParameter("datedepot"));
-			LocalDate localdateDepot = Instant.ofEpochMilli(dateDepot.getTime()).atZone(ZoneId.systemDefault())
-					.toLocalDate();
-
-			v.setDateDepot(localdateDepot);
-
-			Date datevalidation = dateformt.parse(request.getParameter("datevalidation"));
-			LocalDate localdatevalidation = Instant.ofEpochMilli(datevalidation.getTime())
-					.atZone(ZoneId.systemDefault()).toLocalDate();
-
-			v.setDateValidation(localdatevalidation);
-		} catch (ParseException e) {
-			System.out.println("conversion error");
-
+		Integer inventeurId = requiredPositiveInt(request, fieldErrors, "inventeur", "inventeur",
+				"Veuillez selectionner un inventeur.");
+		if (inventeurId != null) {
+			brevet.setInventeur(new Inventeur(inventeurId));
 		}
-		return v;
+
+		validateBean(brevet, fieldErrors, BREVET_FIELD_ALIASES);
+
+		if (brevet.getDateDepot() != null && brevet.getDateValidation() != null
+				&& brevet.getDateDepot().isAfter(brevet.getDateValidation())) {
+			addFieldError(fieldErrors, "datevalidation",
+					"La date de validation doit etre superieure ou egale a la date de depot.");
+		}
+		return brevet;
 	}
 
+	public static class ActiveFilterChip {
+		private final String label;
+		private final String removeUrl;
+
+		public ActiveFilterChip(String label, String removeUrl) {
+			this.label = label;
+			this.removeUrl = removeUrl;
+		}
+
+		public String getLabel() {
+			return label;
+		}
+
+		public String getRemoveUrl() {
+			return removeUrl;
+		}
+	}
 }
-

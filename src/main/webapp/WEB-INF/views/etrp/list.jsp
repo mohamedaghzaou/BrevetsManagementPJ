@@ -5,6 +5,12 @@
 		<a href="ReprotsController?filename=RptEntreprise" class="btn btn-light mb-1 ml-1"><i class="fa fa-print mr-1"></i>
 			Imprimer</a>
 	</div>
+	<c:if test="${status == 'deleted'}">
+		<div class="alert alert-success" role="alert">Entreprise supprimee avec succes.</div>
+	</c:if>
+	<c:if test="${not empty globalError}">
+		<div class="alert alert-danger" role="alert">${globalError}</div>
+	</c:if>
 
 	<div class="table-responsive">
 		<table class="table">
@@ -19,6 +25,11 @@
 				</tr>
 			</thead>
 			<tbody>
+				<c:if test="${empty entreprises}">
+					<tr>
+						<td colspan="6" class="text-center text-muted py-4">Aucune entreprise disponible.</td>
+					</tr>
+				</c:if>
 				<c:forEach items="${entreprises}" var="entreprise">
 					<tr>
 						<td scope="col">${entreprise.nom}</td>
@@ -27,7 +38,7 @@
 						<td scope="col">${entreprise.ville}</td>
 						<td><a class="text-success" href="?mode=updating&id=${entreprise.num}&page=${currentPage}"><i
 									class="fa fa-edit"></i></a></td>
-						<td><a href="?mode=delete&id=${entreprise.num}&page=${currentPage}"><i class="fa fa-trash"></i></a></td>
+						<td><a href="?mode=delete&id=${entreprise.num}&page=${currentPage}" data-confirm-delete="true" data-delete-label="cette entreprise"><i class="fa fa-trash"></i></a></td>
 					</tr>
 				</c:forEach>
 			</tbody>
@@ -38,15 +49,15 @@
 		<nav aria-label="Pagination des entreprises" class="mt-2">
 			<ul class="pagination justify-content-center">
 				<li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-					<a class="page-link" href="?mode=list&page=${currentPage - 1}">Precedent</a>
+					<a class="page-link" href="?mode=list&page=${currentPage - 1}" data-loading-link="true">Precedent</a>
 				</li>
 				<c:forEach begin="1" end="${totalPages}" var="p">
 					<li class="page-item ${currentPage == p ? 'active' : ''}">
-						<a class="page-link" href="?mode=list&page=${p}">${p}</a>
+						<a class="page-link" href="?mode=list&page=${p}" data-loading-link="true">${p}</a>
 					</li>
 				</c:forEach>
 				<li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-					<a class="page-link" href="?mode=list&page=${currentPage + 1}">Suivant</a>
+					<a class="page-link" href="?mode=list&page=${currentPage + 1}" data-loading-link="true">Suivant</a>
 				</li>
 			</ul>
 		</nav>

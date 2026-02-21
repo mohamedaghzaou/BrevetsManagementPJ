@@ -14,6 +14,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,11 +36,16 @@ public class Invention implements Serializable {
 	@Column(name = "NUM_INVENTION")
 	private int num;
 	@Column(name = "DESCRIPTIF")
+	@NotBlank(message = "La description est obligatoire.")
+	@Size(max = 255, message = "La description ne doit pas depasser 255 caracteres.")
 	private String descriptif;
 	@Column(name = "RESUME")
+	@NotBlank(message = "Le resume est obligatoire.")
+	@Size(max = 2000, message = "Le resume ne doit pas depasser 2000 caracteres.")
 	private String resume;
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "num_domaine")
+	@NotNull(message = "Le domaine est obligatoire.")
 	private Domaine domaine;
 	@OneToMany(mappedBy = "invention", cascade = CascadeType.REMOVE)
 	private List<Brevet> brevets;
