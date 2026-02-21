@@ -25,6 +25,16 @@ public class MetierInventeur implements IMetier<Inventeur> {
 	}
 
 	@Override
+	public List<Inventeur> getPage(int page, int pageSize) {
+		return daoInventeur.getPage(page, pageSize);
+	}
+
+	@Override
+	public long count() {
+		return daoInventeur.count();
+	}
+
+	@Override
 	public Inventeur getOne(int id) {
 		return daoInventeur.getOne(id);
 	}

@@ -9,13 +9,18 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@Table(indexes = {
+		@Index(name = "idx_entreprise_nom", columnList = "NOM_ENTREPRISE")
+})
 @Getter
 @Setter
 @NoArgsConstructor

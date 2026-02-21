@@ -13,6 +13,7 @@
 			<div class="alert alert-danger" role="alert">Problème lors de l'ajout</div>
 		</c:if>
 		<input type="hidden" name="op" value="add">
+		<input type="hidden" name="page" value="${param.page}">
 		<div class="form-group">
 			<label for="nom">Nom :</label> <input type="text"
 				class="form-control" pattern="^[a-zA-Z]+$" id="nom" required
@@ -48,5 +49,6 @@
 
 		<button type="submit" class="btn btn-dark">Submit</button>
 		<button type="reset" class="btn btn-light">Vide</button>
+		<a href="?mode=list&page=${empty param.page ? 1 : param.page}" class="btn btn-outline-secondary ml-2"><i class="fa fa-arrow-left mr-1"></i> Retour a la liste</a>
 	</form>
 </div>

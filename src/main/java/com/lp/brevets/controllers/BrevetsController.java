@@ -33,6 +33,7 @@ import com.lp.brevets.util.Constants;
 @WebServlet("/brevets")
 public class BrevetsController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private static final int PAGE_SIZE = 9;
 
 	private IMetier metier;
 
@@ -111,6 +112,8 @@ public class BrevetsController extends HttpServlet {
 	}
 
 	private void loadBrevetSearchPageData(HttpServletRequest request) {
+		int requestedPage = parsePositiveInt(request.getParameter("page"), 1);
+
 		String keyword = normalizeKeyword(request.getParameter("keyword"));
 		Integer inventeurId = parseOptionalInteger(request.getParameter("inventeurId"));
 		Integer entrepriseId = parseOptionalInteger(request.getParameter("entrepriseId"));
@@ -123,11 +126,25 @@ public class BrevetsController extends HttpServlet {
 		String sortBy = normalizeSortBy(request.getParameter("sortBy"));
 		String sortDirection = normalizeSortDirection(request.getParameter("sortDir"));
 
-		List<Brevet> brevets = MetierBrevet.INSTANCE.search(keyword, inventeurId, entrepriseId, domaineId,
-				dateDepotFrom, dateDepotTo, dateValidationFrom, dateValidationTo, sortBy, sortDirection);
+		long totalBrevets = MetierBrevet.INSTANCE.countSearch(keyword, inventeurId, entrepriseId, domaineId, dateDepotFrom,
+				dateDepotTo, dateValidationFrom, dateValidationTo);
+		int totalPages = (int) Math.ceil(totalBrevets / (double) PAGE_SIZE);
+		if (totalPages == 0) {
+			totalPages = 1;
+		}
+		int currentPage = Math.min(requestedPage, totalPages);
+
+		List<Brevet> brevets = MetierBrevet.INSTANCE.searchPage(keyword, inventeurId, entrepriseId, domaineId,
+				dateDepotFrom, dateDepotTo, dateValidationFrom, dateValidationTo, sortBy, sortDirection, currentPage,
+				PAGE_SIZE);
 
 		request.setAttribute(Constants.BREVETS, brevets);
 		request.getSession().setAttribute(Constants.BREVETS, brevets);
+		request.setAttribute("currentPage", currentPage);
+		request.setAttribute("totalPages", totalPages);
+		request.setAttribute("pageSize", PAGE_SIZE);
+		request.setAttribute("totalResults", totalBrevets);
+		request.setAttribute("hasPagination", totalBrevets > PAGE_SIZE);
 
 		metier = MetierInventeur.INSTANCE;
 		List<Inventeur> inventeurs = metier.getAll();
@@ -280,6 +297,18 @@ public class BrevetsController extends HttpServlet {
 			return "asc";
 		}
 		return "desc";
+	}
+
+	private int parsePositiveInt(String value, int defaultValue) {
+		if (value == null || value.isBlank()) {
+			return defaultValue;
+		}
+		try {
+			int parsed = Integer.parseInt(value);
+			return parsed > 0 ? parsed : defaultValue;
+		} catch (NumberFormatException ex) {
+			return defaultValue;
+		}
 	}
 
 	private void add(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

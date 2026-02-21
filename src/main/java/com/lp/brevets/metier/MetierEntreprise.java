@@ -25,6 +25,16 @@ public class MetierEntreprise implements IMetier<Entreprise> {
 	}
 
 	@Override
+	public List<Entreprise> getPage(int page, int pageSize) {
+		return daoEntreprise.getPage(page, pageSize);
+	}
+
+	@Override
+	public long count() {
+		return daoEntreprise.count();
+	}
+
+	@Override
 	public Entreprise getOne(int id) {
 		return daoEntreprise.getOne(id);
 	}

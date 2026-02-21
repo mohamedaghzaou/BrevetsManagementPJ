@@ -15,13 +15,33 @@ public class DaoInventeur implements IDAO<Inventeur> {
 	public List<Inventeur> getAll() {
 		Session s = HibernateUtils.getSessionFactory().getCurrentSession();
 		Transaction t = s.beginTransaction();
-		List<Inventeur> invts = s.createQuery("from Inventeur i join fetch i.entreprise ", Inventeur.class)
+		List<Inventeur> invts = s
+				.createQuery("select i from Inventeur i join fetch i.entreprise order by i.num desc", Inventeur.class)
 				.getResultList();
 		t.commit();
 		s.close();
 		return invts;
 	}
 
+	@Override
+	public List<Inventeur> getPage(int page, int pageSize) {
+		int safePage = Math.max(page, 1);
+		int safePageSize = Math.max(pageSize, 1);
+		int firstResult = (safePage - 1) * safePageSize;
+
+		Session s = HibernateUtils.getSessionFactory().getCurrentSession();
+		Transaction t = s.beginTransaction();
+		List<Inventeur> invts = s
+				.createQuery("select i from Inventeur i join fetch i.entreprise order by i.num desc", Inventeur.class)
+				.setFirstResult(firstResult)
+				.setMaxResults(safePageSize)
+				.getResultList();
+		t.commit();
+		s.close();
+		return invts;
+	}
+
+	@Override
 	public long count() {
 		Session s = HibernateUtils.getSessionFactory().getCurrentSession();
 		Transaction t = s.beginTransaction();
@@ -35,7 +55,8 @@ public class DaoInventeur implements IDAO<Inventeur> {
 	public Inventeur getOne(int id) {
 		Session s = HibernateUtils.getSessionFactory().getCurrentSession();
 		Transaction t = s.beginTransaction();
-		Inventeur d = s.get(Inventeur.class, id);
+		Inventeur d = s.createQuery("select i from Inventeur i join fetch i.entreprise where i.num = :id",
+				Inventeur.class).setParameter("id", id).uniqueResult();
 		t.commit();
 		s.close();
 		return d;

@@ -8,14 +8,22 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@Table(indexes = {
+		@Index(name = "idx_brevet_date_depot", columnList = "DATE_DEPOT"),
+		@Index(name = "idx_brevet_date_validation", columnList = "DATE_VALIDATION"),
+		@Index(name = "idx_brevet_inventeur", columnList = "num_inventeur"),
+		@Index(name = "idx_brevet_invention", columnList = "num_invention")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -31,10 +39,10 @@ public class Brevet implements Serializable {
 	private LocalDate dateDepot;
 	@Column(name = "DATE_VALIDATION")
 	private LocalDate dateValidation;
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "num_invention")
 	private Invention invention;
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "num_inventeur")
 	private Inventeur inventeur;
 

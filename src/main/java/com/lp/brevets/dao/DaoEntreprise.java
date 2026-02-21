@@ -16,7 +16,24 @@ public class DaoEntreprise implements IDAO<Entreprise> {
 	public List<Entreprise> getAll() {
 		Session s = HibernateUtils.getSessionFactory().getCurrentSession();
 		Transaction t = s.beginTransaction();
-		List<Entreprise> ents = s.createQuery("from Entreprise", Entreprise.class).getResultList();
+		List<Entreprise> ents = s.createQuery("from Entreprise e order by e.num desc", Entreprise.class).getResultList();
+		t.commit();
+		s.close();
+		return ents;
+	}
+
+	@Override
+	public List<Entreprise> getPage(int page, int pageSize) {
+		int safePage = Math.max(page, 1);
+		int safePageSize = Math.max(pageSize, 1);
+		int firstResult = (safePage - 1) * safePageSize;
+
+		Session s = HibernateUtils.getSessionFactory().getCurrentSession();
+		Transaction t = s.beginTransaction();
+		List<Entreprise> ents = s.createQuery("from Entreprise e order by e.num desc", Entreprise.class)
+				.setFirstResult(firstResult)
+				.setMaxResults(safePageSize)
+				.getResultList();
 		t.commit();
 		s.close();
 		return ents;
@@ -34,6 +51,7 @@ public class DaoEntreprise implements IDAO<Entreprise> {
 		return ents;
 	}
 
+	@Override
 	public long count() {
 		Session s = HibernateUtils.getSessionFactory().getCurrentSession();
 		Transaction t = s.beginTransaction();

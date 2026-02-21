@@ -25,11 +25,29 @@
 						<td scope="col">${entreprise.activite}</td>
 						<td scope="col">${entreprise.ca}</td>
 						<td scope="col">${entreprise.ville}</td>
-						<td><a class="text-success" href="?mode=updating&id=${entreprise.num}"><i
+						<td><a class="text-success" href="?mode=updating&id=${entreprise.num}&page=${currentPage}"><i
 									class="fa fa-edit"></i></a></td>
-						<td><a href="?mode=delete&id=${entreprise.num}"><i class="fa fa-trash"></i></a></td>
+						<td><a href="?mode=delete&id=${entreprise.num}&page=${currentPage}"><i class="fa fa-trash"></i></a></td>
 					</tr>
 				</c:forEach>
 			</tbody>
 		</table>
 	</div>
+
+	<c:if test="${totalPages > 1}">
+		<nav aria-label="Pagination des entreprises" class="mt-2">
+			<ul class="pagination justify-content-center">
+				<li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+					<a class="page-link" href="?mode=list&page=${currentPage - 1}">Precedent</a>
+				</li>
+				<c:forEach begin="1" end="${totalPages}" var="p">
+					<li class="page-item ${currentPage == p ? 'active' : ''}">
+						<a class="page-link" href="?mode=list&page=${p}">${p}</a>
+					</li>
+				</c:forEach>
+				<li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+					<a class="page-link" href="?mode=list&page=${currentPage + 1}">Suivant</a>
+				</li>
+			</ul>
+		</nav>
+	</c:if>

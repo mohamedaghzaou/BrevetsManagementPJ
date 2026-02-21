@@ -15,10 +15,27 @@ public class DaoDomaine implements IDAO<Domaine> {
 	public List<Domaine> getAll() {
 		Session s = HibernateUtils.getSessionFactory().getCurrentSession();
 		Transaction t = s.beginTransaction();
-		List<Domaine> doms = s.createQuery("from Domaine", Domaine.class).getResultList();
+		List<Domaine> doms = s.createQuery("from Domaine d order by d.num desc", Domaine.class).getResultList();
 		t.commit();
 		s.close();
 		return doms;
+	}
+
+	@Override
+	public List<Domaine> getPage(int page, int pageSize) {
+		int safePage = Math.max(page, 1);
+		int safePageSize = Math.max(pageSize, 1);
+		int firstResult = (safePage - 1) * safePageSize;
+
+		Session s = HibernateUtils.getSessionFactory().getCurrentSession();
+		Transaction t = s.beginTransaction();
+		List<Domaine> domaines = s.createQuery("from Domaine d order by d.num desc", Domaine.class)
+				.setFirstResult(firstResult)
+				.setMaxResults(safePageSize)
+				.getResultList();
+		t.commit();
+		s.close();
+		return domaines;
 	}
 
 	@Override
@@ -63,6 +80,7 @@ public class DaoDomaine implements IDAO<Domaine> {
 		return !Optional.ofNullable(getOne(id)).isPresent();
 	}
 
+	@Override
 	public long count() {
 		Session s = HibernateUtils.getSessionFactory().getCurrentSession();
 		Transaction t = s.beginTransaction();

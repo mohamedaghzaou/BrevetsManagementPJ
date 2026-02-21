@@ -9,13 +9,18 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@Table(indexes = {
+		@Index(name = "idx_domaine_nom", columnList = "NOM_DOMAINE")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,7 +32,7 @@ public class Domaine implements Serializable {
 	private int num;
 	@Column(name = "NOM_DOMAINE")
 	private String nom;
-	@OneToMany(mappedBy = "domaine", fetch = FetchType.EAGER, cascade = CascadeType.REMOVE)
+	@OneToMany(mappedBy = "domaine", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	private List<Invention> inventions;
 
 	public Domaine(int num, String nom) {

@@ -20,6 +20,7 @@
 
 		<input type="hidden" name="op" value="update"> <input
 			type="hidden" name="num" value="${brevet.num }">
+		<input type="hidden" name="page" value="${param.page}">
 		<div class="form-group">
 			<label for="description">Description :</label> <input type="text"
 				class="form-control" id="description" required
@@ -57,6 +58,7 @@
 
 		<button type="submit" class="btn btn-dark">Submit</button>
 		<button type="reset" class="btn btn-light">Vide</button>
+		<a href="?mode=list&page=${empty param.page ? 1 : param.page}" class="btn btn-outline-secondary ml-2"><i class="fa fa-arrow-left mr-1"></i> Retour a la liste</a>
 
 
 	</form>

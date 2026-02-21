@@ -101,7 +101,7 @@
 	</form>
 
 	<p class="text-muted mb-3">
-		<i class="fa fa-list mr-1"></i> Resultats: ${brevets.size()} brevet(s)
+		<i class="fa fa-list mr-1"></i> Resultats: ${totalResults} brevet(s)
 		<c:if test="${hasActiveFilters}">
 			<span class="ml-2">
 				<i class="fa fa-filter mr-1"></i> Filtres:
@@ -127,6 +127,7 @@
 				<c:param name="dateValidationTo" value="${param.dateValidationTo}" />
 				<c:param name="sortBy" value="${param.sortBy}" />
 				<c:param name="sortDir" value="${param.sortDir}" />
+				<c:param name="page" value="${currentPage}" />
 			</c:url>
 			<div class="col-12 col-sm-6 col-md-4 brevet-col mb-4">
 				<div class="card p-3 shadow-sm">
@@ -138,7 +139,7 @@
 					<p><i class="fa fa-tags mr-2 text-dark"></i> ${brevet.invention.domaine.nom}</p>
 					<hr>
 					<div class="d-flex justify-content-end">
-						<a class="text-success mr-3" href="?mode=updating&id=${brevet.num}"><i class="fa fa-edit"></i>
+						<a class="text-success mr-3" href="?mode=updating&id=${brevet.num}&page=${currentPage}"><i class="fa fa-edit"></i>
 							Edit</a>
 						<a class="text-danger" href="${deleteUrl}"><i class="fa fa-trash"></i>
 							Delete</a>
@@ -147,3 +148,66 @@
 			</div>
 		</c:forEach>
 	</div>
+
+	<c:if test="${totalPages > 1}">
+		<nav aria-label="Pagination des brevets" class="mt-2">
+			<ul class="pagination justify-content-center">
+				<c:url var="prevPageUrl" value="brevets">
+					<c:param name="mode" value="list" />
+					<c:param name="page" value="${currentPage - 1}" />
+					<c:param name="keyword" value="${param.keyword}" />
+					<c:param name="inventeurId" value="${param.inventeurId}" />
+					<c:param name="entrepriseId" value="${param.entrepriseId}" />
+					<c:param name="domaineId" value="${param.domaineId}" />
+					<c:param name="dateDepotFrom" value="${param.dateDepotFrom}" />
+					<c:param name="dateDepotTo" value="${param.dateDepotTo}" />
+					<c:param name="dateValidationFrom" value="${param.dateValidationFrom}" />
+					<c:param name="dateValidationTo" value="${param.dateValidationTo}" />
+					<c:param name="sortBy" value="${param.sortBy}" />
+					<c:param name="sortDir" value="${param.sortDir}" />
+				</c:url>
+				<c:url var="nextPageUrl" value="brevets">
+					<c:param name="mode" value="list" />
+					<c:param name="page" value="${currentPage + 1}" />
+					<c:param name="keyword" value="${param.keyword}" />
+					<c:param name="inventeurId" value="${param.inventeurId}" />
+					<c:param name="entrepriseId" value="${param.entrepriseId}" />
+					<c:param name="domaineId" value="${param.domaineId}" />
+					<c:param name="dateDepotFrom" value="${param.dateDepotFrom}" />
+					<c:param name="dateDepotTo" value="${param.dateDepotTo}" />
+					<c:param name="dateValidationFrom" value="${param.dateValidationFrom}" />
+					<c:param name="dateValidationTo" value="${param.dateValidationTo}" />
+					<c:param name="sortBy" value="${param.sortBy}" />
+					<c:param name="sortDir" value="${param.sortDir}" />
+				</c:url>
+
+				<li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+					<a class="page-link" href="${currentPage == 1 ? '#' : prevPageUrl}">Precedent</a>
+				</li>
+
+				<c:forEach begin="1" end="${totalPages}" var="p">
+					<c:url var="pageUrl" value="brevets">
+						<c:param name="mode" value="list" />
+						<c:param name="page" value="${p}" />
+						<c:param name="keyword" value="${param.keyword}" />
+						<c:param name="inventeurId" value="${param.inventeurId}" />
+						<c:param name="entrepriseId" value="${param.entrepriseId}" />
+						<c:param name="domaineId" value="${param.domaineId}" />
+						<c:param name="dateDepotFrom" value="${param.dateDepotFrom}" />
+						<c:param name="dateDepotTo" value="${param.dateDepotTo}" />
+						<c:param name="dateValidationFrom" value="${param.dateValidationFrom}" />
+						<c:param name="dateValidationTo" value="${param.dateValidationTo}" />
+						<c:param name="sortBy" value="${param.sortBy}" />
+						<c:param name="sortDir" value="${param.sortDir}" />
+					</c:url>
+					<li class="page-item ${currentPage == p ? 'active' : ''}">
+						<a class="page-link" href="${pageUrl}">${p}</a>
+					</li>
+				</c:forEach>
+
+				<li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+					<a class="page-link" href="${currentPage == totalPages ? '#' : nextPageUrl}">Suivant</a>
+				</li>
+			</ul>
+		</nav>
+	</c:if>

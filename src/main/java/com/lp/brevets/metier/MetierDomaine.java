@@ -27,6 +27,16 @@ public class MetierDomaine implements IMetier<Domaine> {
 	}
 
 	@Override
+	public List<Domaine> getPage(int page, int pageSize) {
+		return daoDomaine.getPage(page, pageSize);
+	}
+
+	@Override
+	public long count() {
+		return daoDomaine.count();
+	}
+
+	@Override
 	public Domaine getOne(int id) {
 		return daoDomaine.getOne(id);
 	}

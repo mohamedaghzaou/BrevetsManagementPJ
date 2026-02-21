@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.List;
 import java.util.Date;
 
 import javax.servlet.ServletException;
@@ -24,6 +25,7 @@ import com.lp.brevets.util.Constants;
 @WebServlet("/inventeurs")
 public class InventeurController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private static final int PAGE_SIZE = 10;
 
 	private IMetier metier;
 
@@ -40,8 +42,7 @@ public class InventeurController extends HttpServlet {
 
 		switch (command) {
 			case "list":
-				metier = MetierInventeur.INSTANCE;
-				request.getSession().setAttribute(Constants.INVENTEURS, metier.getAll());
+				loadInventeurListPage(request);
 				break;
 
 			case "adding":
@@ -74,6 +75,7 @@ public class InventeurController extends HttpServlet {
 				break;
 			case "delete":
 				delete(request, response);
+				loadInventeurListPage(request);
 				break;
 		}
 
@@ -131,7 +133,6 @@ public class InventeurController extends HttpServlet {
 		int id = Integer.parseInt(request.getParameter("id"));
 		metier = MetierInventeur.INSTANCE;
 		metier.delete(new Inventeur(id));
-		request.getSession().setAttribute(Constants.INVENTEURS, metier.getAll());
 
 	}
 
@@ -155,6 +156,39 @@ public class InventeurController extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		doGet(request, response);
+	}
+
+	private void loadInventeurListPage(HttpServletRequest request) {
+		int requestedPage = parsePositiveInt(request.getParameter("page"), 1);
+
+		metier = MetierInventeur.INSTANCE;
+		long totalInventeurs = metier.count();
+		int totalPages = (int) Math.ceil(totalInventeurs / (double) PAGE_SIZE);
+		if (totalPages == 0) {
+			totalPages = 1;
+		}
+		int currentPage = Math.min(requestedPage, totalPages);
+
+		List<Inventeur> pageData = metier.getPage(currentPage, PAGE_SIZE);
+		request.setAttribute(Constants.INVENTEURS, pageData);
+		request.getSession().setAttribute(Constants.INVENTEURS, pageData);
+		request.setAttribute("currentPage", currentPage);
+		request.setAttribute("totalPages", totalPages);
+		request.setAttribute("pageSize", PAGE_SIZE);
+		request.setAttribute("totalResults", totalInventeurs);
+		request.setAttribute("hasPagination", totalInventeurs > PAGE_SIZE);
+	}
+
+	private int parsePositiveInt(String value, int defaultValue) {
+		if (value == null || value.isBlank()) {
+			return defaultValue;
+		}
+		try {
+			int parsed = Integer.parseInt(value);
+			return parsed > 0 ? parsed : defaultValue;
+		} catch (NumberFormatException ex) {
+			return defaultValue;
+		}
 	}
 
 }

@@ -16,10 +16,30 @@ public class DaoInvention implements IDAO<Invention> {
 	public List<Invention> getAll() {
 		Session s = HibernateUtils.getSessionFactory().getCurrentSession();
 		Transaction t = s.beginTransaction();
-		List<Invention> invts = s.createQuery("from Invention i join fetch i.domaine", Invention.class).getResultList();
+		List<Invention> invts = s
+				.createQuery("select i from Invention i join fetch i.domaine order by i.num desc", Invention.class)
+				.getResultList();
 		t.commit();
 		s.close();
 		return invts;
+	}
+
+	@Override
+	public List<Invention> getPage(int page, int pageSize) {
+		int safePage = Math.max(page, 1);
+		int safePageSize = Math.max(pageSize, 1);
+		int firstResult = (safePage - 1) * safePageSize;
+
+		Session s = HibernateUtils.getSessionFactory().getCurrentSession();
+		Transaction t = s.beginTransaction();
+		List<Invention> inventions = s
+				.createQuery("select i from Invention i join fetch i.domaine order by i.num desc", Invention.class)
+				.setFirstResult(firstResult)
+				.setMaxResults(safePageSize)
+				.getResultList();
+		t.commit();
+		s.close();
+		return inventions;
 	}
 
 	public List<InventionParDomaine> inoventionParDomaine() {
@@ -35,6 +55,7 @@ public class DaoInvention implements IDAO<Invention> {
 		return invts;
 	}
 
+	@Override
 	public long count() {
 		Session s = HibernateUtils.getSessionFactory().getCurrentSession();
 		Transaction t = s.beginTransaction();
@@ -48,7 +69,10 @@ public class DaoInvention implements IDAO<Invention> {
 	public Invention getOne(int id) {
 		Session s = HibernateUtils.getSessionFactory().getCurrentSession();
 		Transaction t = s.beginTransaction();
-		Invention d = s.get(Invention.class, id);
+		Invention d = s
+				.createQuery("select i from Invention i join fetch i.domaine where i.num = :id", Invention.class)
+				.setParameter("id", id)
+				.uniqueResult();
 		t.commit();
 		s.close();
 		return d;

@@ -1,6 +1,7 @@
 package com.lp.brevets.controllers;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -19,6 +20,7 @@ import com.lp.brevets.util.Constants;
 @WebServlet("/inventions")
 public class InventionController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private static final int PAGE_SIZE = 10;
 	private IMetier metier = null;
 
 	public InventionController() {
@@ -34,8 +36,7 @@ public class InventionController extends HttpServlet {
 
 		switch (command) {
 		case "list":
-			metier = MetierInvention.INSTANCE;
-			request.getSession().setAttribute(Constants.INVENTIONS, metier.getAll());
+			loadInventionListPage(request);
 			break;
 
 		case "adding":
@@ -65,6 +66,7 @@ public class InventionController extends HttpServlet {
 			break;
 		case "delete":
 			delete(request, response);
+			loadInventionListPage(request);
 			break;
 		}
 
@@ -103,7 +105,6 @@ public class InventionController extends HttpServlet {
 			Invention invention = constructInvention(request, response);
 			metier.save(invention);
 			request.setAttribute("status", "added");
-			request.getSession().setAttribute(Constants.INVENTIONS, metier.getAll());
 			metier = MetierDomaine.INSTANCE;
 			request.setAttribute("domaines", metier.getAll());
 
@@ -117,7 +118,6 @@ public class InventionController extends HttpServlet {
 		int id = Integer.parseInt(request.getParameter("id"));
 		metier = MetierInvention.INSTANCE;
 		metier.delete(new Invention(id));
-		request.getSession().setAttribute(Constants.INVENTIONS, metier.getAll());
 
 	}
 
@@ -134,6 +134,39 @@ public class InventionController extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		doGet(request, response);
+	}
+
+	private void loadInventionListPage(HttpServletRequest request) {
+		int requestedPage = parsePositiveInt(request.getParameter("page"), 1);
+
+		metier = MetierInvention.INSTANCE;
+		long totalInventions = metier.count();
+		int totalPages = (int) Math.ceil(totalInventions / (double) PAGE_SIZE);
+		if (totalPages == 0) {
+			totalPages = 1;
+		}
+		int currentPage = Math.min(requestedPage, totalPages);
+
+		List<Invention> pageData = metier.getPage(currentPage, PAGE_SIZE);
+		request.setAttribute(Constants.INVENTIONS, pageData);
+		request.getSession().setAttribute(Constants.INVENTIONS, pageData);
+		request.setAttribute("currentPage", currentPage);
+		request.setAttribute("totalPages", totalPages);
+		request.setAttribute("pageSize", PAGE_SIZE);
+		request.setAttribute("totalResults", totalInventions);
+		request.setAttribute("hasPagination", totalInventions > PAGE_SIZE);
+	}
+
+	private int parsePositiveInt(String value, int defaultValue) {
+		if (value == null || value.isBlank()) {
+			return defaultValue;
+		}
+		try {
+			int parsed = Integer.parseInt(value);
+			return parsed > 0 ? parsed : defaultValue;
+		} catch (NumberFormatException ex) {
+			return defaultValue;
+		}
 	}
 
 }

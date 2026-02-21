@@ -10,15 +10,20 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
+@Table(indexes = {
+		@Index(name = "idx_inventeur_entreprise", columnList = "NUM_ENTREPRISE")
+})
 @Getter
 @Setter
 @NoArgsConstructor
@@ -38,7 +43,7 @@ public class Inventeur implements Serializable {
 	private LocalDate date_nais;
 	@Column(name = "EMAIL")
 	private String email;
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "NUM_ENTREPRISE")
 	private Entreprise entreprise;
 	@OneToMany(mappedBy = "inventeur", cascade = CascadeType.REMOVE)

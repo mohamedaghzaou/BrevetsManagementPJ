@@ -26,6 +26,16 @@ public class MetierBrevet implements IMetier<Brevet> {
 	}
 
 	@Override
+	public List<Brevet> getPage(int page, int pageSize) {
+		return daoBrevet.getPage(page, pageSize);
+	}
+
+	@Override
+	public long count() {
+		return daoBrevet.count();
+	}
+
+	@Override
 	public Brevet getOne(int id) {
 		return daoBrevet.getOne(id);
 	}
@@ -50,6 +60,19 @@ public class MetierBrevet implements IMetier<Brevet> {
 			String sortBy, String sortDirection) {
 		return daoBrevet.search(keyword, inventeurId, entrepriseId, domaineId, dateDepotFrom, dateDepotTo,
 				dateValidationFrom, dateValidationTo, sortBy, sortDirection);
+	}
+
+	public List<Brevet> searchPage(String keyword, Integer inventeurId, Integer entrepriseId, Integer domaineId,
+			LocalDate dateDepotFrom, LocalDate dateDepotTo, LocalDate dateValidationFrom, LocalDate dateValidationTo,
+			String sortBy, String sortDirection, int page, int pageSize) {
+		return daoBrevet.searchPage(keyword, inventeurId, entrepriseId, domaineId, dateDepotFrom, dateDepotTo,
+				dateValidationFrom, dateValidationTo, sortBy, sortDirection, page, pageSize);
+	}
+
+	public long countSearch(String keyword, Integer inventeurId, Integer entrepriseId, Integer domaineId,
+			LocalDate dateDepotFrom, LocalDate dateDepotTo, LocalDate dateValidationFrom, LocalDate dateValidationTo) {
+		return daoBrevet.countSearch(keyword, inventeurId, entrepriseId, domaineId, dateDepotFrom, dateDepotTo,
+				dateValidationFrom, dateValidationTo);
 	}
 
 }

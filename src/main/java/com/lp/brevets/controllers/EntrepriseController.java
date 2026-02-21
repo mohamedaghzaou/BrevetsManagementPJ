@@ -1,6 +1,7 @@
 package com.lp.brevets.controllers;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,6 +17,7 @@ import com.lp.brevets.util.Constants;
 @WebServlet("/enterprises")
 public class EntrepriseController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	private static final int PAGE_SIZE = 10;
 
 	private IMetier metier = null;
 
@@ -32,7 +34,7 @@ public class EntrepriseController extends HttpServlet {
 
 		switch (command) {
 		case "list":
-			request.getSession().setAttribute(Constants.ENTREPRISES, metier.getAll());
+			loadEntrepriseListPage(request);
 
 			break;
 
@@ -57,6 +59,7 @@ public class EntrepriseController extends HttpServlet {
 			break;
 		case "delete":
 			delete(request, response);
+			loadEntrepriseListPage(request);
 			break;
 		}
 		request.setAttribute("destination", Constants.ENTREPRISE);
@@ -69,7 +72,6 @@ public class EntrepriseController extends HttpServlet {
 	private void delete(HttpServletRequest request, HttpServletResponse response) {
 		int id = Integer.parseInt(request.getParameter("id"));
 		metier.delete(new Entreprise(id));
-		request.getSession().setAttribute(Constants.ENTREPRISES, metier.getAll());
 
 	}
 
@@ -91,7 +93,6 @@ public class EntrepriseController extends HttpServlet {
 			int id = Integer.parseInt(request.getParameter("num"));
 			e.setNum(id);
 			metier.update(e);
-			request.getSession().setAttribute(Constants.ENTREPRISES, metier.getAll());
 			request.setAttribute(Constants.ENTREPRISE, e);
 			request.setAttribute("status", "updated");
 		} catch (Exception e) {
@@ -105,7 +106,6 @@ public class EntrepriseController extends HttpServlet {
 
 			Entreprise e = constructEntreprise(request, response);
 			metier.save(e);
-			request.getSession().setAttribute(Constants.ENTREPRISES, metier.getAll());
 			request.setAttribute("status", "added");
 
 		} catch (Exception e) {
@@ -117,6 +117,38 @@ public class EntrepriseController extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		doGet(request, response);
+	}
+
+	private void loadEntrepriseListPage(HttpServletRequest request) {
+		int requestedPage = parsePositiveInt(request.getParameter("page"), 1);
+
+		long totalEntreprises = metier.count();
+		int totalPages = (int) Math.ceil(totalEntreprises / (double) PAGE_SIZE);
+		if (totalPages == 0) {
+			totalPages = 1;
+		}
+		int currentPage = Math.min(requestedPage, totalPages);
+
+		List<Entreprise> pageData = metier.getPage(currentPage, PAGE_SIZE);
+		request.setAttribute(Constants.ENTREPRISES, pageData);
+		request.getSession().setAttribute(Constants.ENTREPRISES, pageData);
+		request.setAttribute("currentPage", currentPage);
+		request.setAttribute("totalPages", totalPages);
+		request.setAttribute("pageSize", PAGE_SIZE);
+		request.setAttribute("totalResults", totalEntreprises);
+		request.setAttribute("hasPagination", totalEntreprises > PAGE_SIZE);
+	}
+
+	private int parsePositiveInt(String value, int defaultValue) {
+		if (value == null || value.isBlank()) {
+			return defaultValue;
+		}
+		try {
+			int parsed = Integer.parseInt(value);
+			return parsed > 0 ? parsed : defaultValue;
+		} catch (NumberFormatException ex) {
+			return defaultValue;
+		}
 	}
 
 }

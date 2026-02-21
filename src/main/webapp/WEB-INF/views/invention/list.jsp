@@ -16,9 +16,27 @@
 				</p>
 				<hr>
 				<div>
-					<a href="?mode=updating&id=${i.num}"><i class="fa fa-edit"></i> Update</a>
-					<a href="?mode=delete&id=${i.num}"><i class="fa fa-trash"></i> Delete</a>
+					<a href="?mode=updating&id=${i.num}&page=${currentPage}"><i class="fa fa-edit"></i> Update</a>
+					<a href="?mode=delete&id=${i.num}&page=${currentPage}"><i class="fa fa-trash"></i> Delete</a>
 				</div>
 			</div>
 		</c:forEach>
 	</div>
+
+	<c:if test="${totalPages > 1}">
+		<nav aria-label="Pagination des inventions" class="mt-2">
+			<ul class="pagination justify-content-center">
+				<li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+					<a class="page-link" href="?mode=list&page=${currentPage - 1}">Precedent</a>
+				</li>
+				<c:forEach begin="1" end="${totalPages}" var="p">
+					<li class="page-item ${currentPage == p ? 'active' : ''}">
+						<a class="page-link" href="?mode=list&page=${p}">${p}</a>
+					</li>
+				</c:forEach>
+				<li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+					<a class="page-link" href="?mode=list&page=${currentPage + 1}">Suivant</a>
+				</li>
+			</ul>
+		</nav>
+	</c:if>
