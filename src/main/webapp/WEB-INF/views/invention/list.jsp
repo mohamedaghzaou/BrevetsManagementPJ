@@ -1,8 +1,10 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-	<a href="?mode=adding" class="btn btn-dark mb-1"><i class="fa fa-plus mr-1"></i> Ajouter</a>
-	<a href="ReprotsController?filename=RptInvention" class="btn btn-light mb-1 ml-1"><i class="fa fa-print mr-1"></i>
-		Imprimer</a>
+	<div class="d-flex flex-wrap mb-1">
+		<a href="?mode=adding" class="btn btn-dark mb-1"><i class="fa fa-plus mr-1"></i> Ajouter</a>
+		<a href="ReprotsController?filename=RptInvention" class="btn btn-light mb-1 ml-1"><i class="fa fa-print mr-1"></i>
+			Imprimer</a>
+	</div>
 
 	<div class="row inventions">
 		<c:forEach items="${inventions}" var="i">

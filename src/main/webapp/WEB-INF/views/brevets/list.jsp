@@ -102,6 +102,14 @@
 
 	<p class="text-muted mb-3">
 		<i class="fa fa-list mr-1"></i> Resultats: ${brevets.size()} brevet(s)
+		<c:if test="${hasActiveFilters}">
+			<span class="ml-2">
+				<i class="fa fa-filter mr-1"></i> Filtres:
+				<c:forEach items="${activeFilters}" var="filter">
+					<span class="badge badge-light border mr-1">${filter}</span>
+				</c:forEach>
+			</span>
+		</c:if>
 	</p>
 
 	<div class="row brevetCard">
@@ -120,7 +128,7 @@
 				<c:param name="sortBy" value="${param.sortBy}" />
 				<c:param name="sortDir" value="${param.sortDir}" />
 			</c:url>
-			<div class="col-lg-4 mb-4">
+			<div class="col-12 col-sm-6 col-md-4 brevet-col mb-4">
 				<div class="card p-3 shadow-sm">
 					<p><i class="fa fa-info-circle mr-2 text-primary"></i> ${brevet.description}</p>
 					<p><i class="fa fa-calendar mr-2 text-info"></i> ${brevet.dateDepot} - ${brevet.dateValidation}</p>

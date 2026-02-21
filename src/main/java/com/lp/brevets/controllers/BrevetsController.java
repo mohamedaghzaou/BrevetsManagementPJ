@@ -7,6 +7,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,6 +24,8 @@ import com.lp.brevets.metier.MetierEntreprise;
 import com.lp.brevets.metier.MetierInventeur;
 import com.lp.brevets.metier.MetierInvention;
 import com.lp.brevets.models.Brevet;
+import com.lp.brevets.models.Domaine;
+import com.lp.brevets.models.Entreprise;
 import com.lp.brevets.models.Inventeur;
 import com.lp.brevets.models.Invention;
 import com.lp.brevets.util.Constants;
@@ -127,13 +130,101 @@ public class BrevetsController extends HttpServlet {
 		request.getSession().setAttribute(Constants.BREVETS, brevets);
 
 		metier = MetierInventeur.INSTANCE;
-		request.setAttribute(Constants.INVENTEURS, metier.getAll());
+		List<Inventeur> inventeurs = metier.getAll();
+		request.setAttribute(Constants.INVENTEURS, inventeurs);
 
 		metier = MetierEntreprise.INSTANCE;
-		request.setAttribute(Constants.ENTREPRISES, metier.getAll());
+		List<Entreprise> entreprises = metier.getAll();
+		request.setAttribute(Constants.ENTREPRISES, entreprises);
 
 		metier = MetierDomaine.INSTANCE;
-		request.setAttribute(Constants.DOMAINES, metier.getAll());
+		List<Domaine> domaines = metier.getAll();
+		request.setAttribute(Constants.DOMAINES, domaines);
+
+		List<String> activeFilters = buildActiveFilters(keyword, inventeurId, entrepriseId, domaineId, dateDepotFrom,
+				dateDepotTo, dateValidationFrom, dateValidationTo, inventeurs, entreprises, domaines);
+		request.setAttribute("activeFilters", activeFilters);
+		request.setAttribute("hasActiveFilters", !activeFilters.isEmpty());
+	}
+
+	private List<String> buildActiveFilters(String keyword, Integer inventeurId, Integer entrepriseId, Integer domaineId,
+			LocalDate dateDepotFrom, LocalDate dateDepotTo, LocalDate dateValidationFrom, LocalDate dateValidationTo,
+			List<Inventeur> inventeurs, List<Entreprise> entreprises, List<Domaine> domaines) {
+		List<String> filters = new ArrayList<>();
+
+		if (keyword != null) {
+			filters.add("Recherche: " + keyword);
+		}
+
+		if (inventeurId != null) {
+			filters.add("Inventeur: " + findInventeurLabel(inventeurs, inventeurId));
+		}
+
+		if (entrepriseId != null) {
+			filters.add("Entreprise: " + findEntrepriseLabel(entreprises, entrepriseId));
+		}
+
+		if (domaineId != null) {
+			filters.add("Domaine: " + findDomaineLabel(domaines, domaineId));
+		}
+
+		String depotRange = formatDateRange("Depot", dateDepotFrom, dateDepotTo);
+		if (depotRange != null) {
+			filters.add(depotRange);
+		}
+
+		String validationRange = formatDateRange("Validation", dateValidationFrom, dateValidationTo);
+		if (validationRange != null) {
+			filters.add(validationRange);
+		}
+
+		return filters;
+	}
+
+	private String findInventeurLabel(List<Inventeur> inventeurs, int inventeurId) {
+		if (inventeurs != null) {
+			for (Inventeur inventeur : inventeurs) {
+				if (inventeur.getNum() == inventeurId) {
+					return inventeur.getNom() + " " + inventeur.getPrenom();
+				}
+			}
+		}
+		return "#" + inventeurId;
+	}
+
+	private String findEntrepriseLabel(List<Entreprise> entreprises, int entrepriseId) {
+		if (entreprises != null) {
+			for (Entreprise entreprise : entreprises) {
+				if (entreprise.getNum() == entrepriseId) {
+					return entreprise.getNom();
+				}
+			}
+		}
+		return "#" + entrepriseId;
+	}
+
+	private String findDomaineLabel(List<Domaine> domaines, int domaineId) {
+		if (domaines != null) {
+			for (Domaine domaine : domaines) {
+				if (domaine.getNum() == domaineId) {
+					return domaine.getNom();
+				}
+			}
+		}
+		return "#" + domaineId;
+	}
+
+	private String formatDateRange(String label, LocalDate from, LocalDate to) {
+		if (from == null && to == null) {
+			return null;
+		}
+		if (from != null && to != null) {
+			return label + ": du " + from + " au " + to;
+		}
+		if (from != null) {
+			return label + ": a partir du " + from;
+		}
+		return label + ": jusqu'au " + to;
 	}
 
 	private String normalizeKeyword(String keyword) {

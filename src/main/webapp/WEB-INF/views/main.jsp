@@ -71,12 +71,59 @@
 
             .charts-container {
                 display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+                grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
                 gap: 20px;
             }
 
-            @media (max-width: 500px) {
+            @media (max-width: 767.98px) {
+                .dashboard-container {
+                    padding: 0;
+                }
+
+                .stats-cards {
+                    grid-template-columns: repeat(2, minmax(0, 1fr));
+                    gap: 10px;
+                    margin-bottom: 10px;
+                }
+
+                .card {
+                    padding: 12px;
+                }
+
+                .card .icon {
+                    font-size: 20px;
+                    margin-bottom: 8px;
+                }
+
+                .card h3 {
+                    font-size: 11px;
+                }
+
+                .card .value {
+                    font-size: 22px;
+                }
+
                 .charts-container {
+                    grid-template-columns: 1fr;
+                    gap: 12px;
+                }
+
+                .chart-box {
+                    padding: 10px;
+                }
+
+                .chart-box h4 {
+                    font-size: 14px;
+                    margin-bottom: 8px;
+                }
+
+                .chart-wrapper {
+                    height: 220px;
+                }
+            }
+
+            @media (max-width: 420px) {
+                .stats-cards {
                     grid-template-columns: 1fr;
                 }
             }

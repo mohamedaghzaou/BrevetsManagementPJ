@@ -47,6 +47,6 @@
 			<div id="colorlib-main">
 				<section class="ftco-section pt-1 mb-2 ftco-intro">
 					<div class="container-fluid px-3 px-md-0">
-						<div class="row">
-							<h1 class="display-6 text-right" style="margin-bottom: 0;">Gestion Des Brevets</h1>
+						<div class="row justify-content-center">
+							<h1 class="page-title w-100 text-center">Gestion Des Brevets</h1>
 						</div>

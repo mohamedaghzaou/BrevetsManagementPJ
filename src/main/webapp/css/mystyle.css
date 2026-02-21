@@ -7,13 +7,18 @@
 	color: rgb(255, 91, 93);
 }
 
-.brevetCard>div {
-	margin-left: 10px;
-	padding: 10px;
+.brevetCard .brevet-col {
+	padding-left: 10px;
+	padding-right: 10px;
+	margin-left: 0;
 	border-radius: 10px;
 	margin-top: 5px;
-	width: 32%;
-	background: white;
+	width: auto;
+	background: transparent;
+}
+
+.brevetCard .card {
+	height: 100%;
 }
 
 .icons {
@@ -28,8 +33,7 @@
 	color: white;
 	border: 1px solid white;
 	border-radius: 10px;
-	
-	display:flex;
+	display: flex;
 	flex-direction: column;
 	justify-content: flex-end;
 }
@@ -37,7 +41,6 @@
 .invention a {
 	display: block;
 	color: white;
-	
 }
 
 .invention div {
@@ -47,6 +50,165 @@
 
 .invention hr {
 	background-color: white;
+	width: 100%;
+}
+
+.inventions .invention {
+	margin-bottom: 1rem;
+}
+
+.page-title {
+	margin: 0 0 0.75rem;
+	text-align: center;
+	font-size: clamp(1.3rem, 2.3vw, 2rem);
+	line-height: 1.2;
+	font-weight: 600;
+}
+
+#colorlib-aside {
+	overflow-y: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.table td,
+.table th {
+	vertical-align: middle;
+}
+
+.table-responsive {
+	margin-top: 0.5rem;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 991.98px) {
+	#colorlib-main {
+		padding: 70px 14px 20px;
 		width: 100%;
-	
+	}
+
+	.ftco-section {
+		padding: 1.2rem 0;
+	}
+
+	#colorlib-aside {
+		width: 230px;
+		-moz-transform: translateX(-230px);
+		-webkit-transform: translateX(-230px);
+		-ms-transform: translateX(-230px);
+		-o-transform: translateX(-230px);
+		transform: translateX(-230px);
+		padding: 1.25rem 1rem 2rem;
+		background: #fff;
+	}
+
+	body.offcanvas #colorlib-aside {
+		width: 230px;
+		-moz-transform: translateX(0);
+		-webkit-transform: translateX(0);
+		-ms-transform: translateX(0);
+		-o-transform: translateX(0);
+		transform: translateX(0);
+	}
+
+	#colorlib-aside #colorlib-main-menu ul li {
+		font-size: 1.15rem;
+		margin-bottom: 0.45rem;
+	}
+
+	.colorlib-nav-toggle {
+		left: 0;
+		top: 0;
+		padding: 16px;
+		background: #fff;
+		border-radius: 0 0 10px 0;
+		box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+	}
+
+	body.offcanvas #colorlib-main,
+	body.offcanvas .colorlib-nav-toggle {
+		transform: translateX(0);
+	}
+
+	.page-title {
+		font-size: clamp(1.15rem, 4.2vw, 1.45rem);
+		margin-bottom: 0.55rem;
+	}
+
+	.row>form.col-sm-8 {
+		flex: 0 0 100%;
+		max-width: 100%;
+		padding-left: 0;
+		padding-right: 0;
+	}
+}
+
+@media (max-width: 767.98px) {
+	.page-title {
+		font-size: clamp(1.05rem, 5vw, 1.3rem);
+		margin-bottom: 0.45rem;
+	}
+
+	.container-fluid {
+		padding-left: 0.6rem !important;
+		padding-right: 0.6rem !important;
+	}
+
+	.d-flex.flex-wrap .btn {
+		margin-right: 0.35rem;
+	}
+
+	.table-responsive>.table {
+		min-width: 560px;
+	}
+
+	.invention {
+		padding: 1rem;
+	}
+
+	.invention div {
+		flex-wrap: wrap;
+		justify-content: flex-start;
+		gap: 0.65rem;
+	}
+
+	.card.p-3 .form-group.d-flex.align-items-end {
+		align-items: stretch !important;
+		flex-wrap: wrap;
+	}
+
+	.card.p-3 .form-group.d-flex.align-items-end .btn {
+		width: 100%;
+		margin-left: 0 !important;
+		margin-bottom: 0.45rem;
+	}
+
+	.brevetCard .brevet-col {
+		flex: 0 0 100%;
+		max-width: 100%;
+		padding-left: 0;
+		padding-right: 0;
+	}
+}
+
+@media (min-width: 992px) {
+	#colorlib-aside {
+		width: 220px !important;
+		padding-left: 1.25em;
+		padding-right: 1.25em;
+	}
+
+	#colorlib-main {
+		width: calc(100% - 220px) !important;
+	}
+
+	#colorlib-aside #colorlib-main-menu ul li {
+		font-size: 18px;
+		margin-bottom: 0.35rem;
+	}
+
+	.brevetCard .brevet-col {
+		flex: 0 0 33.333333%;
+		max-width: 33.333333%;
+	}
 }
