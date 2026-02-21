@@ -1,10 +1,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-	<div class="d-flex flex-wrap mb-2">
-		<a href="?mode=adding" class="btn btn-dark mb-1"><i class="fa fa-plus mr-1"></i> Ajouter</a>
-		<a href="ReprotsController?filename=RptBrevet" class="btn btn-light mb-1 ml-1"><i class="fa fa-print mr-1"></i>
-			Imprimer</a>
-	</div>
+	<jsp:include page="/WEB-INF/jspf/list-toolbar.jsp">
+		<jsp:param name="addHref" value="?mode=adding" />
+		<jsp:param name="printHref" value="ReprotsController?filename=RptBrevet" />
+	</jsp:include>
 
 	<c:if test="${status == 'deleted'}">
 		<div class="alert alert-success" role="alert">Brevet supprime avec succes.</div>

@@ -1,7 +1,6 @@
 package com.lp.brevets.controllers;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -9,9 +8,8 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.lp.brevets.metier.IMetier;
-import com.lp.brevets.metier.MetierDomaine;
 import com.lp.brevets.models.Domaine;
+import com.lp.brevets.services.DomaineService;
 import com.lp.brevets.util.Constants;
 
 @WebServlet("/domaines")
@@ -19,7 +17,12 @@ public class DomaineController extends BaseController {
 	private static final long serialVersionUID = 1L;
 	private static final int PAGE_SIZE = 10;
 
-	private IMetier<Domaine> metier = MetierDomaine.INSTANCE;
+	private transient DomaineService domaineService;
+
+	@Override
+	public void init() throws ServletException {
+		domaineService = appServices().getDomaineService();
+	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -47,7 +50,7 @@ public class DomaineController extends BaseController {
 						if (id <= 0) {
 							throw new IllegalArgumentException("Identifiant de domaine invalide.");
 						}
-						request.setAttribute(Constants.DOMAINE, metier.getOne(id));
+						request.setAttribute(Constants.DOMAINE, domaineService.getOne(id));
 					}
 					break;
 				case "delete":
@@ -71,36 +74,22 @@ public class DomaineController extends BaseController {
 		doGet(request, response);
 	}
 
-	private void delete(HttpServletRequest request) {
-		int id = parsePositiveInt(request.getParameter("id"), -1);
-		if (id <= 0) {
-			request.setAttribute("globalError", "Identifiant de domaine invalide.");
-			return;
-		}
-		metier.delete(new Domaine(id));
-		request.setAttribute("status", "deleted");
-	}
-
-	private Domaine constructDomaine(HttpServletRequest request, Map<String, String> fieldErrors) {
-		Domaine domaine = new Domaine();
-		domaine.setNom(requiredText(request, fieldErrors, "nom", "nom", "Le nom du domaine est obligatoire."));
-		validateBean(domaine, fieldErrors);
-		return domaine;
+	private void loadDomaineListPage(HttpServletRequest request) {
+		int requestedPage = parsePositiveInt(request.getParameter("page"), 1);
+		applyPageResult(request, Constants.DOMAINES, domaineService.loadPage(requestedPage, PAGE_SIZE));
 	}
 
 	private void add(HttpServletRequest request) {
 		Map<String, String> fieldErrors = newFieldErrors();
 		Domaine domaine = constructDomaine(request, fieldErrors);
-
 		if (hasErrors(fieldErrors)) {
 			request.setAttribute("status", "validationError");
 			request.setAttribute(Constants.DOMAINE, domaine);
 			publishFieldErrors(request, fieldErrors);
 			return;
 		}
-
 		try {
-			metier.save(domaine);
+			domaineService.save(domaine);
 			request.setAttribute("status", "added");
 		} catch (Exception ex) {
 			request.setAttribute("status", "notAdded");
@@ -117,17 +106,15 @@ public class DomaineController extends BaseController {
 		if (id != null) {
 			domaine.setNum(id);
 		}
-
 		if (hasErrors(fieldErrors)) {
 			request.setAttribute("status", "validationError");
 			request.setAttribute(Constants.DOMAINE, domaine);
 			publishFieldErrors(request, fieldErrors);
 			return;
 		}
-
 		try {
-			metier.update(domaine);
-			request.setAttribute(Constants.DOMAINE, metier.getOne(id));
+			domaineService.update(domaine);
+			request.setAttribute(Constants.DOMAINE, domaineService.getOne(id));
 			request.setAttribute("status", "updated");
 		} catch (Exception ex) {
 			request.setAttribute("status", "notUpdated");
@@ -137,23 +124,20 @@ public class DomaineController extends BaseController {
 		}
 	}
 
-	private void loadDomaineListPage(HttpServletRequest request) {
-		int requestedPage = parsePositiveInt(request.getParameter("page"), 1);
-
-		long totalDomaines = metier.count();
-		int totalPages = (int) Math.ceil(totalDomaines / (double) PAGE_SIZE);
-		if (totalPages == 0) {
-			totalPages = 1;
+	private void delete(HttpServletRequest request) {
+		int id = parsePositiveInt(request.getParameter("id"), -1);
+		if (id <= 0) {
+			request.setAttribute("globalError", "Identifiant de domaine invalide.");
+			return;
 		}
-		int currentPage = Math.min(requestedPage, totalPages);
+		domaineService.delete(id);
+		request.setAttribute("status", "deleted");
+	}
 
-		List<Domaine> pageData = metier.getPage(currentPage, PAGE_SIZE);
-		request.setAttribute(Constants.DOMAINES, pageData);
-		request.getSession().setAttribute(Constants.DOMAINES, pageData);
-		request.setAttribute("currentPage", currentPage);
-		request.setAttribute("totalPages", totalPages);
-		request.setAttribute("pageSize", PAGE_SIZE);
-		request.setAttribute("totalResults", totalDomaines);
-		request.setAttribute("hasPagination", totalDomaines > PAGE_SIZE);
+	private Domaine constructDomaine(HttpServletRequest request, Map<String, String> fieldErrors) {
+		Domaine domaine = new Domaine();
+		domaine.setNom(requiredText(request, fieldErrors, "nom", "nom", "Le nom du domaine est obligatoire."));
+		validateBean(domaine, fieldErrors);
+		return domaine;
 	}
 }

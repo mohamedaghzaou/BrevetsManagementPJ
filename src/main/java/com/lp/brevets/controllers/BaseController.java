@@ -17,6 +17,9 @@ import javax.validation.ValidatorFactory;
 
 import org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator;
 
+import com.lp.brevets.config.ApplicationServices;
+import com.lp.brevets.services.dto.PageResult;
+
 public abstract class BaseController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final ValidatorFactory VALIDATOR_FACTORY = Validation.byDefaultProvider()
@@ -156,6 +159,20 @@ public abstract class BaseController extends HttpServlet {
 			}
 			addFieldError(fieldErrors, property, violation.getMessage());
 		}
+	}
+
+	protected ApplicationServices appServices() {
+		return ApplicationServices.from(getServletContext());
+	}
+
+	protected <T> void applyPageResult(HttpServletRequest request, String attributeName, PageResult<T> pageResult) {
+		request.setAttribute(attributeName, pageResult.getItems());
+		request.getSession().setAttribute(attributeName, pageResult.getItems());
+		request.setAttribute("currentPage", pageResult.getCurrentPage());
+		request.setAttribute("totalPages", pageResult.getTotalPages());
+		request.setAttribute("pageSize", pageResult.getPageSize());
+		request.setAttribute("totalResults", pageResult.getTotalResults());
+		request.setAttribute("hasPagination", pageResult.isHasPagination());
 	}
 
 	protected void handleControllerFailure(HttpServletRequest request, HttpServletResponse response, Exception ex,

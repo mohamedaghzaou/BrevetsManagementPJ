@@ -3,7 +3,6 @@ package com.lp.brevets.controllers;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -11,11 +10,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.lp.brevets.metier.IMetier;
-import com.lp.brevets.metier.MetierEntreprise;
-import com.lp.brevets.metier.MetierInventeur;
 import com.lp.brevets.models.Entreprise;
 import com.lp.brevets.models.Inventeur;
+import com.lp.brevets.services.InventeurService;
 import com.lp.brevets.util.Constants;
 
 @WebServlet("/inventeurs")
@@ -24,7 +21,7 @@ public class InventeurController extends BaseController {
 	private static final int PAGE_SIZE = 10;
 	private static final Map<String, String> INVENTEUR_FIELD_ALIASES = buildInventeurFieldAliases();
 
-	private IMetier<Inventeur> metier;
+	private transient InventeurService inventeurService;
 
 	private static Map<String, String> buildInventeurFieldAliases() {
 		Map<String, String> aliases = new HashMap<>();
@@ -35,6 +32,11 @@ public class InventeurController extends BaseController {
 		aliases.put("date_nais", "datenaiss");
 		aliases.put("entreprise", "entreprise");
 		return aliases;
+	}
+
+	@Override
+	public void init() throws ServletException {
+		inventeurService = appServices().getInventeurService();
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -65,8 +67,7 @@ public class InventeurController extends BaseController {
 						if (id <= 0) {
 							throw new IllegalArgumentException("Identifiant d'inventeur invalide.");
 						}
-						metier = MetierInventeur.INSTANCE;
-						request.setAttribute(Constants.INVENTEUR, metier.getOne(id));
+						request.setAttribute(Constants.INVENTEUR, inventeurService.getOne(id));
 						loadFormData(request);
 					}
 					break;
@@ -86,25 +87,39 @@ public class InventeurController extends BaseController {
 		}
 	}
 
-	private Inventeur constructInventeur(HttpServletRequest request, Map<String, String> fieldErrors) {
-		Inventeur inventeur = new Inventeur();
-		inventeur.setNom(requiredText(request, fieldErrors, "nom", "nom", "Le nom est obligatoire."));
-		inventeur.setPrenom(requiredText(request, fieldErrors, "prenom", "prenom", "Le prenom est obligatoire."));
-		inventeur.setAdresse(requiredText(request, fieldErrors, "adresse", "adresse", "L'adresse est obligatoire."));
-		inventeur.setEmail(requiredText(request, fieldErrors, "email", "email", "L'email est obligatoire."));
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doGet(request, response);
+	}
 
-		LocalDate dateNaiss = requiredDate(request, fieldErrors, "datenaiss", "datenaiss",
-				"La date de naissance est invalide.");
-		inventeur.setDate_nais(dateNaiss);
+	private void loadInventeurListPage(HttpServletRequest request) {
+		int requestedPage = parsePositiveInt(request.getParameter("page"), 1);
+		applyPageResult(request, Constants.INVENTEURS, inventeurService.loadPage(requestedPage, PAGE_SIZE));
+	}
 
-		Integer entrepriseId = requiredPositiveInt(request, fieldErrors, "entreprise", "entreprise",
-				"Veuillez selectionner une entreprise.");
-		if (entrepriseId != null) {
-			inventeur.setEntreprise(new Entreprise(entrepriseId));
+	private void loadFormData(HttpServletRequest request) {
+		request.setAttribute(Constants.ENTREPRISES, inventeurService.getEntrepriseOptions());
+	}
+
+	private void add(HttpServletRequest request) {
+		Map<String, String> fieldErrors = newFieldErrors();
+		Inventeur inventeur = constructInventeur(request, fieldErrors);
+		if (hasErrors(fieldErrors)) {
+			request.setAttribute("status", "validationError");
+			request.setAttribute(Constants.INVENTEUR, inventeur);
+			publishFieldErrors(request, fieldErrors);
+			loadFormData(request);
+			return;
 		}
-
-		validateBean(inventeur, fieldErrors, INVENTEUR_FIELD_ALIASES);
-		return inventeur;
+		try {
+			inventeurService.save(inventeur);
+			request.setAttribute("status", "added");
+		} catch (Exception ex) {
+			request.setAttribute("status", "Notadde");
+			request.setAttribute("globalError", "Impossible d'ajouter l'inventeur.");
+			log("Add inventeur failed", ex);
+		}
+		loadFormData(request);
 	}
 
 	private void update(HttpServletRequest request) {
@@ -114,7 +129,6 @@ public class InventeurController extends BaseController {
 		if (id != null) {
 			inventeur.setNum(id);
 		}
-
 		if (hasErrors(fieldErrors)) {
 			request.setAttribute("status", "validationError");
 			request.setAttribute(Constants.INVENTEUR, inventeur);
@@ -122,11 +136,9 @@ public class InventeurController extends BaseController {
 			loadFormData(request);
 			return;
 		}
-
 		try {
-			metier = MetierInventeur.INSTANCE;
-			metier.update(inventeur);
-			request.setAttribute(Constants.INVENTEUR, metier.getOne(id));
+			inventeurService.update(inventeur);
+			request.setAttribute(Constants.INVENTEUR, inventeurService.getOne(id));
 			request.setAttribute("status", "updated");
 		} catch (Exception ex) {
 			request.setAttribute("status", "notUpdated");
@@ -143,61 +155,26 @@ public class InventeurController extends BaseController {
 			request.setAttribute("globalError", "Identifiant d'inventeur invalide.");
 			return;
 		}
-		metier = MetierInventeur.INSTANCE;
-		metier.delete(new Inventeur(id));
+		inventeurService.delete(id);
 		request.setAttribute("status", "deleted");
 	}
 
-	private void add(HttpServletRequest request) {
-		Map<String, String> fieldErrors = newFieldErrors();
-		Inventeur inventeur = constructInventeur(request, fieldErrors);
+	private Inventeur constructInventeur(HttpServletRequest request, Map<String, String> fieldErrors) {
+		Inventeur inventeur = new Inventeur();
+		inventeur.setNom(requiredText(request, fieldErrors, "nom", "nom", "Le nom est obligatoire."));
+		inventeur.setPrenom(requiredText(request, fieldErrors, "prenom", "prenom", "Le prenom est obligatoire."));
+		inventeur.setAdresse(requiredText(request, fieldErrors, "adresse", "adresse", "L'adresse est obligatoire."));
+		inventeur.setEmail(requiredText(request, fieldErrors, "email", "email", "L'email est obligatoire."));
+		LocalDate dateNaiss = requiredDate(request, fieldErrors, "datenaiss", "datenaiss",
+				"La date de naissance est invalide.");
+		inventeur.setDate_nais(dateNaiss);
 
-		if (hasErrors(fieldErrors)) {
-			request.setAttribute("status", "validationError");
-			request.setAttribute(Constants.INVENTEUR, inventeur);
-			publishFieldErrors(request, fieldErrors);
-			loadFormData(request);
-			return;
+		Integer entrepriseId = requiredPositiveInt(request, fieldErrors, "entreprise", "entreprise",
+				"Veuillez selectionner une entreprise.");
+		if (entrepriseId != null) {
+			inventeur.setEntreprise(new Entreprise(entrepriseId));
 		}
-
-		try {
-			metier = MetierInventeur.INSTANCE;
-			metier.save(inventeur);
-			request.setAttribute("status", "added");
-		} catch (Exception ex) {
-			request.setAttribute("status", "Notadde");
-			request.setAttribute("globalError", "Impossible d'ajouter l'inventeur.");
-			log("Add inventeur failed", ex);
-		}
-		loadFormData(request);
-	}
-
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		doGet(request, response);
-	}
-
-	private void loadInventeurListPage(HttpServletRequest request) {
-		int requestedPage = parsePositiveInt(request.getParameter("page"), 1);
-		metier = MetierInventeur.INSTANCE;
-		long totalInventeurs = metier.count();
-		int totalPages = (int) Math.ceil(totalInventeurs / (double) PAGE_SIZE);
-		if (totalPages == 0) {
-			totalPages = 1;
-		}
-		int currentPage = Math.min(requestedPage, totalPages);
-
-		List<Inventeur> pageData = metier.getPage(currentPage, PAGE_SIZE);
-		request.setAttribute(Constants.INVENTEURS, pageData);
-		request.getSession().setAttribute(Constants.INVENTEURS, pageData);
-		request.setAttribute("currentPage", currentPage);
-		request.setAttribute("totalPages", totalPages);
-		request.setAttribute("pageSize", PAGE_SIZE);
-		request.setAttribute("totalResults", totalInventeurs);
-		request.setAttribute("hasPagination", totalInventeurs > PAGE_SIZE);
-	}
-
-	private void loadFormData(HttpServletRequest request) {
-		request.setAttribute(Constants.ENTREPRISES, MetierEntreprise.INSTANCE.getAll());
+		validateBean(inventeur, fieldErrors, INVENTEUR_FIELD_ALIASES);
+		return inventeur;
 	}
 }

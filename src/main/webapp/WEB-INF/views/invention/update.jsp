@@ -1,22 +1,16 @@
-﻿<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <div>
 	<h5>Modifier une Invention</h5>
 </div>
 <div class="row">
 	<form action="" class="col-sm-8" method="post" data-loading="true">
-		<c:if test="${ status=='updated' }">
-			<div class="alert alert-success" role="alert">Invention modifiee avec succes.</div>
-		</c:if>
-		<c:if test="${status=='notUpdated' }">
-			<div class="alert alert-danger" role="alert">Probleme lors de la mise a jour.</div>
-		</c:if>
-		<c:if test="${not empty globalError}">
-			<div class="alert alert-danger" role="alert">${globalError}</div>
-		</c:if>
-		<c:if test="${not empty fieldErrors}">
-			<div class="alert alert-warning" role="alert">Veuillez corriger les champs en erreur.</div>
-		</c:if>
+		<jsp:include page="/WEB-INF/jspf/form-feedback.jsp">
+			<jsp:param name="successStatus" value="updated" />
+			<jsp:param name="successMessage" value="Invention modifiee avec succes." />
+			<jsp:param name="errorStatus" value="notUpdated" />
+			<jsp:param name="errorMessage" value="Probleme lors de la mise a jour." />
+		</jsp:include>
 		<input type="hidden" name="op" value="update">
 		<input type="hidden" name="id" value="${invention.num}">
 		<input type="hidden" name="page" value="${param.page}">
@@ -50,9 +44,9 @@
 			</c:if>
 		</div>
 
-		<button type="submit" class="btn btn-dark">Submit</button>
-		<button type="reset" class="btn btn-light">Vide</button>
-		<a href="?mode=list&page=${empty param.page ? 1 : param.page}" class="btn btn-outline-secondary ml-2"><i class="fa fa-arrow-left mr-1"></i> Retour a la liste</a>
+		<jsp:include page="/WEB-INF/jspf/form-buttons.jsp">
+			<jsp:param name="returnHref" value="?mode=list&amp;page=${empty param.page ? 1 : param.page}" />
+		</jsp:include>
 
 	</form>
 </div>

@@ -1,22 +1,16 @@
-﻿<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 
 <div>
 	<h5>Ajouter une Invention</h5>
 </div>
 <div class="row">
 	<form action="" class="col-sm-8" method="post" data-loading="true">
-		<c:if test="${ status=='added' }">
-			<div class="alert alert-success" role="alert">Invention ajoutee avec succes.</div>
-		</c:if>
-		<c:if test="${status=='Notadded' }">
-			<div class="alert alert-danger" role="alert">Probleme lors de l'ajout de l'invention.</div>
-		</c:if>
-		<c:if test="${not empty globalError}">
-			<div class="alert alert-danger" role="alert">${globalError}</div>
-		</c:if>
-		<c:if test="${not empty fieldErrors}">
-			<div class="alert alert-warning" role="alert">Veuillez corriger les champs en erreur.</div>
-		</c:if>
+		<jsp:include page="/WEB-INF/jspf/form-feedback.jsp">
+			<jsp:param name="successStatus" value="added" />
+			<jsp:param name="successMessage" value="Invention ajoutee avec succes." />
+			<jsp:param name="errorStatus" value="Notadded" />
+			<jsp:param name="errorMessage" value="Probleme lors de l'ajout de l'invention." />
+		</jsp:include>
 
 		<input type="hidden" name="op" value="add">
 		<input type="hidden" name="page" value="${param.page}">
@@ -49,8 +43,8 @@
 				<small class="text-danger">${fieldErrors.domaine}</small>
 			</c:if>
 		</div>
-		<button type="submit" class="btn btn-dark">Submit</button>
-		<button type="reset" class="btn btn-light">Vide</button>
-		<a href="?mode=list&page=${empty param.page ? 1 : param.page}" class="btn btn-outline-secondary ml-2"><i class="fa fa-arrow-left mr-1"></i> Retour a la liste</a>
+		<jsp:include page="/WEB-INF/jspf/form-buttons.jsp">
+			<jsp:param name="returnHref" value="?mode=list&amp;page=${empty param.page ? 1 : param.page}" />
+		</jsp:include>
 	</form>
 </div>
