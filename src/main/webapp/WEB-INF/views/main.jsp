@@ -1,10 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1" pageEncoding="ISO-8859-1" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
     <!DOCTYPE html>
     <html>
 
     <head>
         <meta charset="ISO-8859-1">
-        <title>Dashboard - Gestion des Brevets</title>
+        <title><fmt:message key="dashboard.title" bundle="${i18n}" /></title>
 
         <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
         <style type="text/css">
@@ -163,35 +164,35 @@
                 <a href="brevets" class="card-link">
                     <div class="card">
                         <div class="icon"><i class="fa fa-certificate"></i></div>
-                        <h3>Total Brevets</h3>
+                        <h3><fmt:message key="dashboard.total.brevets" bundle="${i18n}" /></h3>
                         <div class="value" id="totalBrevets">-</div>
                     </div>
                 </a>
                 <a href="inventions" class="card-link">
                     <div class="card">
                         <div class="icon"><i class="fa fa-lightbulb-o"></i></div>
-                        <h3>Total Inventions</h3>
+                        <h3><fmt:message key="dashboard.total.inventions" bundle="${i18n}" /></h3>
                         <div class="value" id="totalInventions">-</div>
                     </div>
                 </a>
                 <a href="inventeurs" class="card-link">
                     <div class="card">
                         <div class="icon"><i class="fa fa-users"></i></div>
-                        <h3>Total Inventeurs</h3>
+                        <h3><fmt:message key="dashboard.total.inventeurs" bundle="${i18n}" /></h3>
                         <div class="value" id="totalInventeurs">-</div>
                     </div>
                 </a>
                 <a href="enterprises" class="card-link">
                     <div class="card">
                         <div class="icon"><i class="fa fa-building"></i></div>
-                        <h3>Total Entreprises</h3>
+                        <h3><fmt:message key="dashboard.total.entreprises" bundle="${i18n}" /></h3>
                         <div class="value" id="totalEntreprises">-</div>
                     </div>
                 </a>
                 <a href="domaines" class="card-link">
                     <div class="card">
                         <div class="icon"><i class="fa fa-tags"></i></div>
-                        <h3>Total Domaines</h3>
+                        <h3><fmt:message key="dashboard.total.domaines" bundle="${i18n}" /></h3>
                         <div class="value" id="totalDomaines">-</div>
                     </div>
                 </a>
@@ -199,13 +200,13 @@
 
             <div class="charts-container">
                 <div class="chart-box">
-                    <h4>Brevets par Entreprise</h4>
+                    <h4><fmt:message key="dashboard.chart.brevetsByEntreprise" bundle="${i18n}" /></h4>
                     <div class="chart-wrapper">
                         <canvas id="inventionParEntreprise"></canvas>
                     </div>
                 </div>
                 <div class="chart-box">
-                    <h4>Inventions par Domaine</h4>
+                    <h4><fmt:message key="dashboard.chart.inventionsByDomaine" bundle="${i18n}" /></h4>
                     <div class="chart-wrapper">
                         <canvas id="inventionParDomanine"></canvas>
                     </div>
@@ -246,7 +247,7 @@
                     data: {
                         labels: inventionParEntreprise.map(e => e.Entreprise),
                         datasets: [{
-                            label: 'Nombre de brevets',
+                            label: '<fmt:message key="dashboard.chart.brevetCount" bundle="${i18n}" />',
                             data: inventionParEntreprise.map(e => e.nbInventions),
                             backgroundColor: colors.slice(0, inventionParEntreprise.length),
                             borderRadius: 6,

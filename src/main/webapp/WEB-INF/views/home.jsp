@@ -4,5 +4,5 @@
 
 <jsp:include page="${page}"/>
 
-<jsp:include page="/WEB-INF/jspf/footer.jspf"/>
+<jsp:include page="/WEB-INF/jspf/footer.jsp"/>
 
