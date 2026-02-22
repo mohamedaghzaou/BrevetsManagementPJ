@@ -106,6 +106,86 @@ a.badge.badge-light.border:hover {
 	background: #f1f3f5;
 }
 
+.list-toolbar-sticky {
+	position: sticky;
+	top: 52px;
+	z-index: 1030;
+	padding: 0.35rem 0;
+	background: #fafafa;
+}
+
+.sticky-filter-panel {
+	position: sticky;
+	top: 104px;
+	z-index: 1020;
+}
+
+.sortable-th {
+	cursor: pointer;
+	user-select: none;
+	white-space: nowrap;
+}
+
+.sortable-th .sort-indicator {
+	display: inline-block;
+	width: 12px;
+	margin-left: 6px;
+	opacity: 0.65;
+}
+
+.sortable-th[data-sort-dir='asc'] .sort-indicator::before {
+	content: '\\25B2';
+	font-size: 10px;
+}
+
+.sortable-th[data-sort-dir='desc'] .sort-indicator::before {
+	content: '\\25BC';
+	font-size: 10px;
+}
+
+.app-toast-container {
+	position: fixed;
+	right: 16px;
+	bottom: 16px;
+	z-index: 14000;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	min-width: 260px;
+	max-width: 360px;
+}
+
+.app-toast-item {
+	border-radius: 8px;
+	padding: 0.65rem 0.85rem;
+	color: #fff;
+	box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+	opacity: 0;
+	transform: translateY(8px);
+	transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.app-toast-item.show {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.app-toast-item.toast-success {
+	background: #2e7d32;
+}
+
+.app-toast-item.toast-danger {
+	background: #c62828;
+}
+
+.app-toast-item.toast-warning {
+	background: #ef6c00;
+}
+
+.app-toast-item.toast-info {
+	background: #1565c0;
+}
+
 .top-lang-switch {
 	display: inline-flex !important;
 	align-items: center;
@@ -158,6 +238,14 @@ a.badge.badge-light.border:hover {
 	#colorlib-main {
 		padding: 70px 14px 20px;
 		width: 100%;
+	}
+
+	.list-toolbar-sticky {
+		top: 46px;
+	}
+
+	.sticky-filter-panel {
+		top: 90px;
 	}
 
 	.ftco-section {
@@ -234,6 +322,14 @@ a.badge.badge-light.border:hover {
 		padding-right: 0.6rem !important;
 	}
 
+	.list-toolbar-sticky {
+		top: 42px;
+	}
+
+	.sticky-filter-panel {
+		top: 80px;
+	}
+
 	.d-flex.flex-wrap .btn {
 		margin-right: 0.35rem;
 	}
@@ -282,6 +378,14 @@ a.badge.badge-light.border:hover {
 	.top-lang-switch {
 		top: 8px;
 		right: 8px;
+	}
+
+	.app-toast-container {
+		right: 10px;
+		left: 10px;
+		bottom: 10px;
+		min-width: 0;
+		max-width: none;
 	}
 }
 

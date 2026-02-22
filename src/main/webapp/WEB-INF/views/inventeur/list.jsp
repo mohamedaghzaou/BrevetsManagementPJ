@@ -6,20 +6,23 @@
 	<jsp:param name="printHref" value="ReprotsController?filename=RptInventeur" />
 </jsp:include>
 <c:if test="${status == 'deleted'}">
-	<div class="alert alert-success" role="alert"><fmt:message key="inventeur.deleted.success" bundle="${i18n}" /></div>
+	<div class="alert alert-success" role="alert" data-toast="true"><fmt:message key="inventeur.deleted.success" bundle="${i18n}" /></div>
+</c:if>
+<c:if test="${status == 'updated'}">
+	<div class="alert alert-success" role="alert" data-toast="true"><fmt:message key="inventeur.update.success" bundle="${i18n}" /></div>
 </c:if>
 <c:if test="${not empty globalError}">
-	<div class="alert alert-danger" role="alert">${globalError}</div>
+	<div class="alert alert-danger" role="alert" data-toast="true">${globalError}</div>
 </c:if>
 <div class="table-responsive">
-	<table class="table">
+	<table class="table js-sortable-table">
 		<thead class="thead-dark">
 			<tr>
-				<th scope="col"><i class="fa fa-user mr-1"></i> <fmt:message key="inventeur.table.name" bundle="${i18n}" /></th>
-				<th scope="col"><i class="fa fa-envelope mr-1"></i> <fmt:message key="field.email" bundle="${i18n}" /></th>
-				<th scope="col"><i class="fa fa-map-marker mr-1"></i> <fmt:message key="field.address" bundle="${i18n}" /></th>
-				<th scope="col"><i class="fa fa-calendar mr-1"></i> <fmt:message key="field.birthDate" bundle="${i18n}" /></th>
-				<th scope="col"><i class="fa fa-building mr-1"></i> <fmt:message key="nav.entreprise" bundle="${i18n}" /></th>
+				<th scope="col" class="sortable-th" data-sortable="true" data-sort-type="text"><i class="fa fa-user mr-1"></i> <fmt:message key="inventeur.table.name" bundle="${i18n}" /><span class="sort-indicator"></span></th>
+				<th scope="col" class="sortable-th" data-sortable="true" data-sort-type="text"><i class="fa fa-envelope mr-1"></i> <fmt:message key="field.email" bundle="${i18n}" /><span class="sort-indicator"></span></th>
+				<th scope="col" class="sortable-th" data-sortable="true" data-sort-type="text"><i class="fa fa-map-marker mr-1"></i> <fmt:message key="field.address" bundle="${i18n}" /><span class="sort-indicator"></span></th>
+				<th scope="col" class="sortable-th" data-sortable="true" data-sort-type="date"><i class="fa fa-calendar mr-1"></i> <fmt:message key="field.birthDate" bundle="${i18n}" /><span class="sort-indicator"></span></th>
+				<th scope="col" class="sortable-th" data-sortable="true" data-sort-type="text"><i class="fa fa-building mr-1"></i> <fmt:message key="nav.entreprise" bundle="${i18n}" /><span class="sort-indicator"></span></th>
 				<th scope="col"></th>
 				<th scope="col"></th>
 			</tr>
@@ -31,7 +34,7 @@
 				</tr>
 			</c:if>
 			<c:forEach items="${inventeurs}" var="inventeur">
-				<tr>
+				<tr data-sort-row="true">
 					<td scope="col">${inventeur.nom} ${inventeur.prenom}</td>
 					<td scope="col">${inventeur.email}</td>
 					<td scope="col">${inventeur.adresse}</td>

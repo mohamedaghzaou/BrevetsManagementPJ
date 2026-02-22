@@ -91,6 +91,7 @@ public class InventionController extends BaseController {
 	private void loadInventionListPage(HttpServletRequest request) {
 		int requestedPage = parsePositiveInt(request.getParameter("page"), 1);
 		applyPageResult(request, Constants.INVENTIONS, inventionService.loadPage(requestedPage, PAGE_SIZE));
+		request.setAttribute(Constants.DOMAINES, inventionService.getDomaineOptions());
 	}
 
 	private void loadFormData(HttpServletRequest request) {

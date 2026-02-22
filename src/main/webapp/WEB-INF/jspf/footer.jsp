@@ -40,11 +40,16 @@
         </div>
     </div>
 
+    <div id="appToastContainer" class="app-toast-container" aria-live="polite" aria-atomic="true"></div>
+
     <script src="js/jquery.min.js"></script>
     <script src="js/popper.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/main.js"></script>
     <script>
+        window.AppUxConfig = window.AppUxConfig || {};
+        window.AppUxConfig.shortcutHelpMessage = '<fmt:message key="shortcut.help" bundle="${i18n}" />';
+
         (function() {
             const localeDeleteLabel = '<fmt:message key="modal.delete.item.default" bundle="${i18n}" />';
             const localeDeleteQuestionPrefix = '<fmt:message key="modal.delete.question.prefix" bundle="${i18n}" />';

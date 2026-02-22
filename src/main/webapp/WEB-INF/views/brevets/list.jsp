@@ -7,19 +7,19 @@
 </jsp:include>
 
 <c:if test="${status == 'deleted'}">
-	<div class="alert alert-success" role="alert"><fmt:message key="brevets.deleted.success" bundle="${i18n}" /></div>
+	<div class="alert alert-success" role="alert" data-toast="true"><fmt:message key="brevets.deleted.success" bundle="${i18n}" /></div>
 </c:if>
 <c:if test="${not empty globalError}">
-	<div class="alert alert-danger" role="alert">${globalError}</div>
+	<div class="alert alert-danger" role="alert" data-toast="true">${globalError}</div>
 </c:if>
 
-<form method="get" action="brevets" class="card p-3 shadow-sm mb-3" data-loading="true">
+<form method="get" action="brevets" class="card p-3 shadow-sm mb-3 sticky-filter-panel" data-loading="true">
 	<input type="hidden" name="mode" value="list">
 
 	<div class="form-row">
 		<div class="form-group col-md-4">
 			<label for="keyword"><i class="fa fa-search mr-1"></i> <fmt:message key="common.search" bundle="${i18n}" /></label>
-			<input type="text" class="form-control" id="keyword" name="keyword"
+			<input type="text" class="form-control js-shortcut-filter" id="keyword" name="keyword"
 				value="${param.keyword}" placeholder="<fmt:message key='brevets.search.placeholder' bundle='${i18n}'/>">
 		</div>
 		<div class="form-group col-md-4">

@@ -95,6 +95,7 @@ public class InventeurController extends BaseController {
 	private void loadInventeurListPage(HttpServletRequest request) {
 		int requestedPage = parsePositiveInt(request.getParameter("page"), 1);
 		applyPageResult(request, Constants.INVENTEURS, inventeurService.loadPage(requestedPage, PAGE_SIZE));
+		request.setAttribute(Constants.ENTREPRISES, inventeurService.getEntrepriseOptions());
 	}
 
 	private void loadFormData(HttpServletRequest request) {

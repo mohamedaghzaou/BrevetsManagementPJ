@@ -6,17 +6,20 @@
     <jsp:param name="printHref" value="ReprotsController?filename=RptDomaine" />
 </jsp:include>
 <c:if test="${status == 'deleted'}">
-    <div class="alert alert-success" role="alert"><fmt:message key="domaine.deleted.success" bundle="${i18n}" /></div>
+    <div class="alert alert-success" role="alert" data-toast="true"><fmt:message key="domaine.deleted.success" bundle="${i18n}" /></div>
+</c:if>
+<c:if test="${status == 'updated'}">
+    <div class="alert alert-success" role="alert" data-toast="true"><fmt:message key="domaine.update.success" bundle="${i18n}" /></div>
 </c:if>
 <c:if test="${not empty globalError}">
-    <div class="alert alert-danger" role="alert">${globalError}</div>
+    <div class="alert alert-danger" role="alert" data-toast="true">${globalError}</div>
 </c:if>
 
 <div class="table-responsive">
-    <table class="table">
+    <table class="table js-sortable-table">
         <thead class="thead-dark">
             <tr>
-                <th scope="col"><fmt:message key="domaine.table.name" bundle="${i18n}" /></th>
+                <th scope="col" class="sortable-th" data-sortable="true" data-sort-type="text"><fmt:message key="domaine.table.name" bundle="${i18n}" /><span class="sort-indicator"></span></th>
                 <th scope="col"></th>
                 <th scope="col"></th>
             </tr>
@@ -28,7 +31,7 @@
                 </tr>
             </c:if>
             <c:forEach items="${domaines}" var="domaine">
-                <tr>
+                <tr data-sort-row="true">
                     <td scope="col">${domaine.nom}</td>
                     <td><a class="text-success" href="?mode=updating&id=${domaine.num}&page=${currentPage}"><i class="fa fa-edit"></i></a>
                     </td>
