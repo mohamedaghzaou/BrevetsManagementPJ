@@ -123,7 +123,7 @@
 
 <div class="row brevetCard">
 	<c:if test="${empty brevets}">
-		<div class="col-12">
+		<div class="brevet-empty">
 			<div class="card p-4 text-center shadow-sm">
 				<h6 class="mb-2"><fmt:message key="brevets.empty.title" bundle="${i18n}" /></h6>
 				<p class="text-muted mb-3"><fmt:message key="brevets.empty.subtitle" bundle="${i18n}" /></p>
@@ -147,7 +147,7 @@
 			<c:param name="sortDir" value="${param.sortDir}" />
 			<c:param name="page" value="${currentPage}" />
 		</c:url>
-		<div class="col-12 col-sm-6 col-md-4 brevet-col mb-4">
+		<div class="brevet-col">
 			<div class="card p-3 shadow-sm">
 				<p><i class="fa fa-info-circle mr-2 text-primary"></i> ${brevet.description}</p>
 				<p><i class="fa fa-calendar mr-2 text-info"></i> ${brevet.dateDepot} - ${brevet.dateValidation}</p>

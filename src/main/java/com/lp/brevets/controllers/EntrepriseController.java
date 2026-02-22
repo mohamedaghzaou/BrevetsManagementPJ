@@ -129,6 +129,10 @@ public class EntrepriseController extends BaseController {
 			request.setAttribute("globalError", "Identifiant d'entreprise invalide.");
 			return;
 		}
+		if (entrepriseService.getOne(id) == null) {
+			request.setAttribute("globalError", "Entreprise introuvable.");
+			return;
+		}
 		entrepriseService.delete(id);
 		request.setAttribute("status", "deleted");
 	}

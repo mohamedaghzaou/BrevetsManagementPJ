@@ -1,7 +1,6 @@
 package com.lp.brevets.controllers;
 
 import java.io.IOException;
-import java.sql.Connection;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -26,15 +25,17 @@ public class ReprotsController extends HttpServlet {
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		
 		String fileName = request.getParameter("filename");
+		if (fileName == null || fileName.isBlank()) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Nom de rapport manquant.");
+			return;
+		}
 		OpenReport.Open(fileName, getServletContext(), response);
 
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		doGet(request, response);
 	}
 

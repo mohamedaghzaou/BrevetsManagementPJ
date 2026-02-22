@@ -152,6 +152,10 @@ public class InventionController extends BaseController {
 			request.setAttribute("globalError", "Identifiant d'invention invalide.");
 			return;
 		}
+		if (inventionService.getOne(id) == null) {
+			request.setAttribute("globalError", "Invention introuvable.");
+			return;
+		}
 		inventionService.delete(id);
 		request.setAttribute("status", "deleted");
 	}

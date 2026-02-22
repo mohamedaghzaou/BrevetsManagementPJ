@@ -176,6 +176,10 @@ public class BrevetsController extends BaseController {
 			request.setAttribute("globalError", "Identifiant de brevet invalide.");
 			return;
 		}
+		if (brevetService.getOne(id) == null) {
+			request.setAttribute("globalError", "Brevet introuvable.");
+			return;
+		}
 		brevetService.delete(id);
 		request.setAttribute("status", "deleted");
 	}

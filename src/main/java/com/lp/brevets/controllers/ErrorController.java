@@ -29,10 +29,10 @@ public class ErrorController extends BaseController {
 
 	private String resolveTitle(HttpServletRequest request) {
 		Object statusCode = request.getAttribute("javax.servlet.error.status_code");
-		if (statusCode == null) {
+		Integer status = parseStatusCode(statusCode);
+		if (status == null) {
 			return "Une erreur est survenue";
 		}
-		int status = Integer.parseInt(statusCode.toString());
 		if (status == HttpServletResponse.SC_NOT_FOUND) {
 			return "Page introuvable";
 		}
@@ -40,6 +40,20 @@ public class ErrorController extends BaseController {
 			return "Erreur interne du serveur";
 		}
 		return "Erreur " + status;
+	}
+
+	private Integer parseStatusCode(Object statusCode) {
+		if (statusCode == null) {
+			return null;
+		}
+		if (statusCode instanceof Number) {
+			return ((Number) statusCode).intValue();
+		}
+		try {
+			return Integer.parseInt(statusCode.toString());
+		} catch (NumberFormatException ex) {
+			return null;
+		}
 	}
 
 	private String resolveMessage(HttpServletRequest request) {

@@ -1,5 +1,13 @@
 .brevetCard {
-	margin: auto;
+	margin: 0;
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 1rem;
+}
+
+.row.brevetCard {
+	margin-left: 0;
+	margin-right: 0;
 }
 
 .brevetCard p>i {
@@ -8,17 +16,20 @@
 }
 
 .brevetCard .brevet-col {
-	padding-left: 10px;
-	padding-right: 10px;
-	margin-left: 0;
+	padding: 0;
+	margin: 0;
 	border-radius: 10px;
-	margin-top: 5px;
-	width: auto;
+	width: 100%;
+	max-width: none;
 	background: transparent;
 }
 
 .brevetCard .card {
 	height: 100%;
+}
+
+.brevetCard .brevet-empty {
+	grid-column: 1 / -1;
 }
 
 .icons {
@@ -359,13 +370,6 @@ a.badge.badge-light.border:hover {
 		margin-bottom: 0.45rem;
 	}
 
-	.brevetCard .brevet-col {
-		flex: 0 0 100%;
-		max-width: 100%;
-		padding-left: 0;
-		padding-right: 0;
-	}
-
 	.lang-btn,
 	.lang-switch-btn {
 		min-width: 38px;
@@ -389,6 +393,12 @@ a.badge.badge-light.border:hover {
 	}
 }
 
+@media (min-width: 768px) and (max-width: 1199.98px) {
+	.brevetCard {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
 @media (min-width: 992px) {
 	#colorlib-aside {
 		width: 220px !important;
@@ -406,7 +416,13 @@ a.badge.badge-light.border:hover {
 	}
 
 	.brevetCard .brevet-col {
-		flex: 0 0 33.333333%;
-		max-width: 33.333333%;
+		flex: initial;
+		max-width: none;
+	}
+}
+
+@media (max-width: 767.98px) {
+	.brevetCard {
+		grid-template-columns: 1fr !important;
 	}
 }

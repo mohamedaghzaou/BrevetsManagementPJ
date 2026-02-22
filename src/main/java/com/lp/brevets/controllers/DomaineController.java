@@ -130,6 +130,10 @@ public class DomaineController extends BaseController {
 			request.setAttribute("globalError", "Identifiant de domaine invalide.");
 			return;
 		}
+		if (domaineService.getOne(id) == null) {
+			request.setAttribute("globalError", "Domaine introuvable.");
+			return;
+		}
 		domaineService.delete(id);
 		request.setAttribute("status", "deleted");
 	}

@@ -167,7 +167,6 @@ public abstract class BaseController extends HttpServlet {
 
 	protected <T> void applyPageResult(HttpServletRequest request, String attributeName, PageResult<T> pageResult) {
 		request.setAttribute(attributeName, pageResult.getItems());
-		request.getSession().setAttribute(attributeName, pageResult.getItems());
 		request.setAttribute("currentPage", pageResult.getCurrentPage());
 		request.setAttribute("totalPages", pageResult.getTotalPages());
 		request.setAttribute("pageSize", pageResult.getPageSize());
